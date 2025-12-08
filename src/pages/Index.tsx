@@ -135,6 +135,7 @@ const Index = () => {
     "Транспорт": "transport",
     "Косметика": "cosmetic",
     "Музичні кассети": "cassettes",
+    "Воркшоп": "workshop",
     "Кастомні предмети": "custom",
   };
 
