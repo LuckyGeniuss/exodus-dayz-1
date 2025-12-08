@@ -263,6 +263,8 @@ export type Database = {
           created_at: string | null
           id: string
           is_veteran: boolean | null
+          referral_code: string | null
+          referred_by: string | null
           steam_id: string | null
           updated_at: string | null
           username: string | null
@@ -273,6 +275,8 @@ export type Database = {
           created_at?: string | null
           id: string
           is_veteran?: boolean | null
+          referral_code?: string | null
+          referred_by?: string | null
           steam_id?: string | null
           updated_at?: string | null
           username?: string | null
@@ -283,6 +287,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_veteran?: boolean | null
+          referral_code?: string | null
+          referred_by?: string | null
           steam_id?: string | null
           updated_at?: string | null
           username?: string | null
@@ -346,6 +352,33 @@ export type Database = {
           request_count?: number
           user_id?: string | null
           window_start?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          bonus_given: boolean | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          bonus_given?: boolean | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          bonus_given?: boolean | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_id?: string
+          referrer_id?: string
         }
         Relationships: []
       }
