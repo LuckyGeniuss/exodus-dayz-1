@@ -13,6 +13,8 @@ import Footer from '@/components/Footer';
 import { Badge } from '@/components/ui/badge';
 import SteamAuthButton from '@/components/auth/SteamAuthButton';
 import AchievementsModal from '@/components/AchievementsModal';
+import BalanceHistory from '@/components/BalanceHistory';
+import ReferralCard from '@/components/ReferralCard';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -259,6 +261,12 @@ const Profile = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Referral Card */}
+          <ReferralCard />
+
+          {/* Balance History */}
+          <BalanceHistory />
         </div>
       </main>
       <Footer />
