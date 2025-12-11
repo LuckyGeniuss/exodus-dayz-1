@@ -237,6 +237,8 @@ const ProductManagement = () => {
                           <SelectItem value="vehicle">Транспорт</SelectItem>
                           <SelectItem value="clothing">Одяг</SelectItem>
                           <SelectItem value="cassette">Касети</SelectItem>
+                          <SelectItem value="workshop">Воркшоп</SelectItem>
+                          <SelectItem value="custom">Кастомні предмети</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
