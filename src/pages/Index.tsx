@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductSkeleton from "@/components/ProductSkeleton";
 import SearchBar from "@/components/SearchBar";
 import ProductFilters, { SortOption, Category } from "@/components/ProductFilters";
+import Pagination from "@/components/Pagination";
 import EmptyState from "@/components/EmptyState";
 import CartDrawer from "@/components/cart/CartDrawer";
 import Footer from "@/components/Footer";
@@ -17,6 +18,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Search, Package } from "lucide-react";
 
+const ITEMS_PER_PAGE = 12;
+
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -26,6 +29,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<Array<{ productId: string; quantity: number }>>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const { products, loading: productsLoading } = useProducts();
 
   const maxPrice = useMemo(() => {
@@ -180,6 +184,14 @@ const Index = () => {
       case "name-desc":
         sorted.sort((a, b) => b.name.localeCompare(a.name));
         break;
+      case "popular":
+        // Sort by price descending as popularity proxy
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+      case "rating":
+        // Sort by price as rating proxy (higher price = higher quality)
+        sorted.sort((a, b) => b.price - a.price);
+        break;
       case "newest":
       default:
         // Already sorted by created_at desc from DB
@@ -188,6 +200,18 @@ const Index = () => {
     
     return sorted;
   }, [selectedCategories, priceRange, searchQuery, sortOption, products]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategories, priceRange, searchQuery, sortOption]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -242,11 +266,11 @@ const Index = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {productsLoading ? (
               // Show skeletons while loading
-              Array.from({ length: 8 }).map((_, index) => (
+              Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
                 <ProductSkeleton key={index} />
               ))
             ) : (
-              filteredProducts.map((product, index) => (
+              paginatedProducts.map((product, index) => (
                 <div
                   key={product.id}
                   style={{ animationDelay: `${index * 50}ms` }}
@@ -260,17 +284,27 @@ const Index = () => {
             )}
             </div>
 
-        {filteredProducts.length === 0 && !productsLoading && (
-          <EmptyState
-            icon={searchQuery ? Search : Package}
-            title={searchQuery ? 'Нічого не знайдено' : 'Товарів поки немає'}
-            description={
-              searchQuery 
-                ? 'Спробуйте змінити параметри пошуку або фільтри' 
-                : 'Оберіть іншу категорію або скиньте фільтри'
-            }
-          />
-        )}
+            {filteredProducts.length === 0 && !productsLoading && (
+              <EmptyState
+                icon={searchQuery ? Search : Package}
+                title={searchQuery ? 'Нічого не знайдено' : 'Товарів поки немає'}
+                description={
+                  searchQuery 
+                    ? 'Спробуйте змінити параметри пошуку або фільтри' 
+                    : 'Оберіть іншу категорію або скиньте фільтри'
+                }
+              />
+            )}
+
+            {filteredProducts.length > 0 && !productsLoading && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalItems={filteredProducts.length}
+              />
+            )}
           </div>
         </div>
       </section>

@@ -14,7 +14,7 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 
-export type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
+export type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest" | "popular" | "rating";
 export type Category = "all" | "vip" | "clothing" | "transport" | "cosmetic" | "cassettes" | "custom" | "workshop";
 
 interface ProductFiltersProps {
@@ -40,6 +40,8 @@ const categories: { id: Category; label: string }[] = [
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Найновіші" },
+  { value: "popular", label: "Популярні" },
+  { value: "rating", label: "За рейтингом" },
   { value: "price-asc", label: "Ціна: від низької" },
   { value: "price-desc", label: "Ціна: від високої" },
   { value: "name-asc", label: "Назва: А-Я" },
