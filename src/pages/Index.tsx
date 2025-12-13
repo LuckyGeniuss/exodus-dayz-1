@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import VeteranBanner from "@/components/VeteranBanner";
@@ -12,9 +13,9 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useProducts } from "@/hooks/useProducts";
+import { useProductsRatings } from "@/hooks/useProductsRatings";
 import { Product } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Search, Package } from "lucide-react";
 
@@ -23,22 +24,55 @@ const ITEMS_PER_PAGE = 12;
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-  const [sortOption, setSortOption] = useState<SortOption>("newest");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Parse URL params
+  const initialCategories = (searchParams.get('categories')?.split(',').filter(Boolean) || []) as Category[];
+  const initialSort = (searchParams.get('sort') || 'newest') as SortOption;
+  const initialSearch = searchParams.get('search') || '';
+  const initialPage = parseInt(searchParams.get('page') || '1', 10);
+  const initialMinPrice = parseInt(searchParams.get('min') || '0', 10);
+  const initialMaxPrice = parseInt(searchParams.get('max') || '10000', 10);
+
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>(initialCategories);
+  const [sortOption, setSortOption] = useState<SortOption>(initialSort);
+  const [priceRange, setPriceRange] = useState<[number, number]>([initialMinPrice, initialMaxPrice]);
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<Array<{ productId: string; quantity: number }>>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const { products, loading: productsLoading } = useProducts();
+  const { data: ratingsData } = useProductsRatings();
 
   const maxPrice = useMemo(() => {
     return Math.max(...products.map(p => p.price), 10000);
   }, [products]);
 
+  // Update URL when filters change
   useEffect(() => {
-    setPriceRange([0, maxPrice]);
-  }, [maxPrice]);
+    const params = new URLSearchParams();
+    
+    if (selectedCategories.length > 0) {
+      params.set('categories', selectedCategories.join(','));
+    }
+    if (sortOption !== 'newest') {
+      params.set('sort', sortOption);
+    }
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    if (currentPage > 1) {
+      params.set('page', currentPage.toString());
+    }
+    if (priceRange[0] > 0) {
+      params.set('min', priceRange[0].toString());
+    }
+    if (priceRange[1] < maxPrice) {
+      params.set('max', priceRange[1].toString());
+    }
+    
+    setSearchParams(params, { replace: true });
+  }, [selectedCategories, sortOption, searchQuery, currentPage, priceRange, maxPrice, setSearchParams]);
 
   useEffect(() => {
     if (user) {
@@ -134,14 +168,22 @@ const Index = () => {
   };
 
   const categoryMap: Record<string, Category> = {
-    "VIP": "vip",
-    "Одяг": "clothing",
+    "Пріоритет": "vip",
     "Транспорт": "transport",
-    "Косметика": "cosmetic",
-    "Музичні кассети": "cassettes",
-    "Воркшоп": "workshop",
-    "Кастомні предмети": "custom",
+    "Набори": "kits",
+    "Будматеріали": "materials",
+    "Контейнери": "containers",
+    "Запчастини": "parts",
   };
+
+  // Create ratings lookup map
+  const ratingsMap = useMemo(() => {
+    const map = new Map<string, { averageRating: number; reviewCount: number }>();
+    ratingsData?.forEach(r => {
+      map.set(r.productId, { averageRating: r.averageRating, reviewCount: r.reviewCount });
+    });
+    return map;
+  }, [ratingsData]);
 
   const filteredProducts = useMemo(() => {
     let filtered = products;
@@ -185,12 +227,20 @@ const Index = () => {
         sorted.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case "popular":
-        // Sort by price descending as popularity proxy
-        sorted.sort((a, b) => b.price - a.price);
+        // Sort by review count
+        sorted.sort((a, b) => {
+          const aCount = ratingsMap.get(a.id)?.reviewCount || 0;
+          const bCount = ratingsMap.get(b.id)?.reviewCount || 0;
+          return bCount - aCount;
+        });
         break;
       case "rating":
-        // Sort by price as rating proxy (higher price = higher quality)
-        sorted.sort((a, b) => b.price - a.price);
+        // Sort by average rating
+        sorted.sort((a, b) => {
+          const aRating = ratingsMap.get(a.id)?.averageRating || 0;
+          const bRating = ratingsMap.get(b.id)?.averageRating || 0;
+          return bRating - aRating;
+        });
         break;
       case "newest":
       default:
@@ -199,7 +249,7 @@ const Index = () => {
     }
     
     return sorted;
-  }, [selectedCategories, priceRange, searchQuery, sortOption, products]);
+  }, [selectedCategories, priceRange, searchQuery, sortOption, products, ratingsMap]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -237,8 +287,7 @@ const Index = () => {
             Магазин <span className="text-primary">товарів</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Обирайте з нашої колекції VIP-пакетів, косметичних предметів та унікальних модифікацій.
-            Всі товари відповідають правилам монетизації Bohemia Interactive.
+            Обирайте з нашої колекції пріоритету, транспорту, наборів для кланів та будівельних матеріалів.
           </p>
         </div>
         
@@ -278,6 +327,7 @@ const Index = () => {
                   <ProductCard 
                     product={product}
                     onAddToCart={addToCart}
+                    rating={ratingsMap.get(product.id)}
                   />
                 </div>
               ))
