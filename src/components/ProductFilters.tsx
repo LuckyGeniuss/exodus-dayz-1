@@ -15,7 +15,7 @@ import {
 } from "./ui/sheet";
 
 export type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest" | "popular" | "rating";
-export type Category = "all" | "vip" | "clothing" | "transport" | "cosmetic" | "cassettes" | "custom" | "workshop";
+export type Category = "vip" | "transport" | "kits" | "materials" | "containers" | "parts";
 
 interface ProductFiltersProps {
   onSortChange: (sort: SortOption) => void;
@@ -29,13 +29,12 @@ interface ProductFiltersProps {
 }
 
 const categories: { id: Category; label: string }[] = [
-  { id: "vip", label: "VIP" },
-  { id: "clothing", label: "Одяг" },
+  { id: "vip", label: "Пріоритет" },
   { id: "transport", label: "Транспорт" },
-  { id: "cosmetic", label: "Косметика" },
-  { id: "cassettes", label: "Музичні кассети" },
-  { id: "workshop", label: "Воркшоп" },
-  { id: "custom", label: "Кастомні предмети" },
+  { id: "kits", label: "Набори" },
+  { id: "materials", label: "Будматеріали" },
+  { id: "containers", label: "Контейнери" },
+  { id: "parts", label: "Запчастини" },
 ];
 
 const sortOptions: { value: SortOption; label: string }[] = [

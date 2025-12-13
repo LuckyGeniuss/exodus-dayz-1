@@ -1,4 +1,4 @@
-import { ShoppingCart, Heart, Tag } from "lucide-react";
+import { ShoppingCart, Heart, Tag, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
@@ -20,9 +20,10 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (productId: string) => void;
+  rating?: { averageRating: number; reviewCount: number };
 }
 
-const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { getProductPromotion } = usePromotions();
   const inWishlist = isInWishlist(product.id);
@@ -47,6 +48,9 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
               src={product.image}
               alt={product.name}
               className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder.svg';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <Button
@@ -68,10 +72,17 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
           </div>
         </CardHeader>
       <CardContent className="p-4">
-        <div className="mb-2">
+        <div className="flex items-center justify-between mb-2">
           <Badge variant="outline">
             {product.category}
           </Badge>
+          {rating && rating.reviewCount > 0 && (
+            <div className="flex items-center gap-1 text-sm">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span className="font-medium">{rating.averageRating.toFixed(1)}</span>
+              <span className="text-muted-foreground">({rating.reviewCount})</span>
+            </div>
+          )}
         </div>
         <h3 className="font-bold text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h3>
         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
