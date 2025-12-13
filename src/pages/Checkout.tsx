@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useLoyalty } from '@/hooks/useLoyalty';
+import { usePromoCode } from '@/hooks/usePromoCode';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CreditCard, Wallet, Banknote, ShoppingCart } from 'lucide-react';
+import { Loader2, CreditCard, Wallet, Banknote, ShoppingCart, Tag, X, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -36,15 +37,14 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { checkAndUnlockAchievements } = useAchievements();
   const { addCashback } = useLoyalty();
+  const { loading: promoLoading, appliedCode, applyCode, removeCode, calculateDiscount, recordUsage } = usePromoCode();
   const [currentStep, setCurrentStep] = useState(2);
   const [showConfetti, setShowConfetti] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'usdt' | 'balance'>('card');
   const [profile, setProfile] = useState<any>(null);
   const [processing, setProcessing] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoDiscount, setPromoDiscount] = useState(0);
-  const [promoError, setPromoError] = useState('');
+  const [promoCodeInput, setPromoCodeInput] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -102,26 +102,12 @@ const Checkout = () => {
   }, 0);
 
   const veteranDiscount = profile?.is_veteran ? subtotal * 0.1 : 0;
-  const promoDiscountAmount = subtotal * (promoDiscount / 100);
+  const promoDiscountAmount = calculateDiscount(subtotal);
   const total = subtotal - veteranDiscount - promoDiscountAmount;
 
-  const applyPromoCode = () => {
-    setPromoError('');
-    
-    const validPromoCodes: Record<string, number> = {
-      'EXODUS10': 10,
-      'VIP15': 15,
-      'WELCOME5': 5,
-    };
-    
-    const upperCode = promoCode.toUpperCase();
-    if (validPromoCodes[upperCode]) {
-      setPromoDiscount(validPromoCodes[upperCode]);
-      toast.success(`Промокод застосовано! Знижка ${validPromoCodes[upperCode]}%`);
-    } else {
-      setPromoError('Невірний промокод');
-      setPromoDiscount(0);
-    }
+  const handleApplyPromo = async () => {
+    await applyCode(promoCodeInput, subtotal);
+    setPromoCodeInput('');
   };
 
   const handleCheckout = async () => {
@@ -320,35 +306,67 @@ const Checkout = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <div className="space-y-2">
-                  <Label htmlFor="promoCode">Промокод</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="promoCode"
-                      value={promoCode}
-                      onChange={(e) => {
-                        setPromoCode(e.target.value);
-                        setPromoError('');
-                      }}
-                      placeholder="Введіть промокод"
-                      className={promoError ? 'border-destructive' : ''}
-                    />
+                {appliedCode ? (
+                  <div className="flex items-center justify-between p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-primary" />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="font-mono">
+                            {appliedCode.code}
+                          </Badge>
+                          <span className="text-sm font-medium text-primary">
+                            -{appliedCode.discount_percent}%
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Економія: {promoDiscountAmount.toFixed(0)} ₴
+                        </p>
+                      </div>
+                    </div>
                     <Button
-                      type="button"
-                      variant="outline"
-                      onClick={applyPromoCode}
-                      disabled={!promoCode.trim()}
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeCode}
+                      className="h-8 w-8 p-0"
                     >
-                      Застосувати
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  {promoError && (
-                    <p className="text-sm text-destructive">{promoError}</p>
-                  )}
-                  {promoDiscount > 0 && (
-                    <p className="text-sm text-green-600">✓ Промокод застосовано: -{promoDiscount}%</p>
-                  )}
-                </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label htmlFor="promoCode" className="flex items-center gap-2">
+                      <Tag className="h-4 w-4" />
+                      Промокод
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="promoCode"
+                        value={promoCodeInput}
+                        onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                        placeholder="Введіть промокод"
+                        className="font-mono"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleApplyPromo();
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleApplyPromo}
+                        disabled={promoLoading || !promoCodeInput.trim()}
+                      >
+                        {promoLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Застосувати'}
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Доступні промокоди: EXODUS10, NEWPLAYER, VIP20
+                    </p>
+                  </div>
+                )}
                 
                 <Separator />
                 

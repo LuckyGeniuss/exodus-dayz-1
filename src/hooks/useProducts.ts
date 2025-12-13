@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/components/ProductCard';
+import { productImages } from '@/data/productImages';
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,7 +28,8 @@ export const useProducts = () => {
         name: p.name,
         price: Number(p.price),
         description: p.description || '',
-        image: p.image || '',
+        // Use local image if available, otherwise fallback to database URL
+        image: productImages[p.id] || p.image || '/placeholder.svg',
         category: p.category,
       }));
 
