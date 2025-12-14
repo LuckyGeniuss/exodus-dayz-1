@@ -261,6 +261,7 @@ export type Database = {
           avatar_url: string | null
           balance: number | null
           created_at: string | null
+          discord_id: string | null
           id: string
           is_veteran: boolean | null
           referral_code: string | null
@@ -273,6 +274,7 @@ export type Database = {
           avatar_url?: string | null
           balance?: number | null
           created_at?: string | null
+          discord_id?: string | null
           id: string
           is_veteran?: boolean | null
           referral_code?: string | null
@@ -285,6 +287,7 @@ export type Database = {
           avatar_url?: string | null
           balance?: number | null
           created_at?: string | null
+          discord_id?: string | null
           id?: string
           is_veteran?: boolean | null
           referral_code?: string | null
