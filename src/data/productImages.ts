@@ -1,51 +1,66 @@
-// Product images
-import priorityMonth from '@/assets/products/priority-month.jpg';
-import vehicleGunter from '@/assets/products/vehicle-gunter.jpg';
-import vehicleAda from '@/assets/products/vehicle-ada.jpg';
-import vehicleAdaOfficial from '@/assets/products/vehicle-ada-official.webp';
-import vehicleV3s from '@/assets/products/vehicle-v3s.jpg';
-import vehicleSarka from '@/assets/products/vehicle-sarka.jpg';
-import kitDuo from '@/assets/products/kit-duo.jpg';
-import kitBig from '@/assets/products/kit-big.jpg';
-import buildCodelock from '@/assets/products/build-codelock.jpg';
-import buildNails from '@/assets/products/build-nails.jpg';
-import containerChest from '@/assets/products/container-chest.jpg';
-import containerBigbox from '@/assets/products/container-bigbox.jpg';
-import containerWeaponrack from '@/assets/products/container-weaponrack.jpg';
-import partsBattery from '@/assets/products/parts-battery.jpg';
+// Product images - Generated DayZ style images
+import vehicleGunterGen from '@/assets/products/vehicle-gunter-gen.jpg';
+import vehicleAdaGen from '@/assets/products/vehicle-ada-gen.jpg';
+import vehicleV3sGen from '@/assets/products/vehicle-v3s-gen.jpg';
+import vehicleSarkaGen from '@/assets/products/vehicle-sarka-gen.jpg';
+import vehicleOlgaGen from '@/assets/products/vehicle-olga-gen.jpg';
+import vehicleHmmwvGen from '@/assets/products/vehicle-hmmwv-gen.jpg';
+import vehicleBoatGen from '@/assets/products/vehicle-boat-gen.jpg';
+import containerCrateGen from '@/assets/products/container-crate-gen.jpg';
+import containerWeaponrackGen from '@/assets/products/container-weaponrack-gen.jpg';
+import containerLockerGen from '@/assets/products/container-locker-gen.jpg';
+import partsBatteryGen from '@/assets/products/parts-battery-gen.jpg';
+import partsRadiatorGen from '@/assets/products/parts-radiator-gen.jpg';
+import buildCodelockGen from '@/assets/products/build-codelock-gen.jpg';
+import buildNailsGen from '@/assets/products/build-nails-gen.jpg';
+import buildCamonetGen from '@/assets/products/build-camonet-gen.jpg';
+import buildFlagpoleGen from '@/assets/products/build-flagpole-gen.jpg';
+import priorityVipGen from '@/assets/products/priority-vip-gen.jpg';
+import kitStarterGen from '@/assets/products/kit-starter-gen.jpg';
 
 export const productImages: Record<string, string> = {
-  'priority-month': priorityMonth,
-  'priority-week': priorityMonth, // Same image for week
-  'vehicle-gunter': vehicleGunter,
-  'vehicle-ada': vehicleAdaOfficial,
-  'vehicle-olga': vehicleAdaOfficial, // Similar vehicle
-  'vehicle-v3s': vehicleV3s,
-  'vehicle-hamer': vehicleGunter, // Similar vehicle
-  'vehicle-sarka': vehicleSarka,
-  'vehicle-hmmwv': vehicleGunter, // Similar military vehicle
-  'vehicle-boat': vehicleAda, // Placeholder
-  'vehicle-niva': vehicleSarka, // Similar compact
-  'vehicle-volga': vehicleSarka, // Similar compact
-  'kit-duo': kitDuo,
-  'kit-trio': kitDuo, // Similar kit
-  'kit-mid': kitBig, // Similar kit
-  'kit-big': kitBig,
-  'build-codelock': buildCodelock,
-  'build-nails': buildNails,
-  'build-flagpole': buildCodelock, // Placeholder
-  'build-camonet': buildNails, // Placeholder
-  'container-chest': containerChest,
-  'container-bigbox': containerBigbox,
-  'container-pallet': containerBigbox, // Similar storage
-  'container-weaponrack': containerWeaponrack,
-  'container-military-locker': containerBigbox,
-  'container-personal-locker': containerBigbox,
-  'parts-radiator': partsBattery,
-  'parts-sparkplug': partsBattery,
-  'parts-battery': partsBattery,
-  'parts-canister': partsBattery,
-  'parts-key': partsBattery,
+  // Пріоритет
+  'priority-month': priorityVipGen,
+  'priority-week': priorityVipGen,
+  
+  // Транспорт
+  'vehicle-gunter': vehicleGunterGen,
+  'vehicle-ada': vehicleAdaGen,
+  'vehicle-olga': vehicleOlgaGen,
+  'vehicle-v3s': vehicleV3sGen,
+  'vehicle-hamer': vehicleGunterGen, // Similar hatchback
+  'vehicle-sarka': vehicleSarkaGen,
+  'vehicle-hmmwv': vehicleHmmwvGen,
+  'vehicle-boat': vehicleBoatGen,
+  'vehicle-niva': vehicleAdaGen, // Similar SUV
+  'vehicle-volga': vehicleOlgaGen, // Similar sedan
+  
+  // Набори
+  'kit-duo': kitStarterGen,
+  'kit-trio': kitStarterGen,
+  'kit-mid': kitStarterGen,
+  'kit-big': kitStarterGen,
+  
+  // Будматеріали
+  'build-codelock': buildCodelockGen,
+  'build-nails': buildNailsGen,
+  'build-flagpole': buildFlagpoleGen,
+  'build-camonet': buildCamonetGen,
+  
+  // Контейнери
+  'container-chest': containerCrateGen,
+  'container-bigbox': containerCrateGen,
+  'container-pallet': containerCrateGen,
+  'container-weaponrack': containerWeaponrackGen,
+  'container-military-locker': containerLockerGen,
+  'container-personal-locker': containerLockerGen,
+  
+  // Запчастини
+  'parts-radiator': partsRadiatorGen,
+  'parts-sparkplug': partsBatteryGen, // Similar part
+  'parts-battery': partsBatteryGen,
+  'parts-canister': partsBatteryGen, // Placeholder
+  'parts-key': buildCodelockGen, // Similar item
 };
 
 export default productImages;
