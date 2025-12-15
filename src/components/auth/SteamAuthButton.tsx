@@ -49,19 +49,29 @@ const SteamAuthButton = ({ userId, onSuccess }: SteamAuthButtonProps) => {
           `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
         );
 
-        // Poll for window close or success
+        // Listen for success message from popup
+        const handleMessage = (event: MessageEvent) => {
+          if (event.data?.type === 'STEAM_AUTH_SUCCESS') {
+            setLoading(false);
+            if (onSuccess) onSuccess();
+            window.removeEventListener('message', handleMessage);
+          }
+        };
+        window.addEventListener('message', handleMessage);
+
+        // Fallback: poll for window close
         const checkInterval = setInterval(() => {
           if (steamWindow?.closed) {
             clearInterval(checkInterval);
             setLoading(false);
-            // Refresh profile to check if Steam ID was added
+            window.removeEventListener('message', handleMessage);
             if (onSuccess) onSuccess();
           }
         }, 500);
 
-        // Auto-close polling after 5 minutes
         setTimeout(() => {
           clearInterval(checkInterval);
+          window.removeEventListener('message', handleMessage);
           setLoading(false);
         }, 300000);
       }

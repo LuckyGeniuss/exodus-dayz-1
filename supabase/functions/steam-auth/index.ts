@@ -115,18 +115,29 @@ Deno.serve(async (req) => {
 
       console.log('Profile updated successfully for user:', user.id);
 
-      // Return success with redirect
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          steamId,
-          redirect: `${Deno.env.get('SUPABASE_URL')?.replace('https://', 'https://app.')}/`
-        }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      // Return HTML page that closes popup and refreshes parent
+      const successHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head><title>Steam Connected</title></head>
+          <body>
+            <script>
+              if (window.opener) {
+                window.opener.postMessage({ type: 'STEAM_AUTH_SUCCESS', steamId: '${steamId}' }, '*');
+                window.close();
+              } else {
+                document.body.innerHTML = '<h2>Steam підключено успішно! Можете закрити це вікно.</h2>';
+              }
+            </script>
+            <h2>Steam підключено успішно!</h2>
+          </body>
+        </html>
+      `;
+
+      return new Response(successHtml, { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'text/html' } 
+      });
     }
 
     // Handle initial Steam login request
