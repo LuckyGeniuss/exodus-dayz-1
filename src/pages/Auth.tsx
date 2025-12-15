@@ -1,12 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/components/auth/AuthProvider';
+import SteamLoginButton from '@/components/auth/SteamLoginButton';
 import { toast } from 'sonner';
 
 // Validation schemas
@@ -17,6 +19,7 @@ const usernameSchema = z.string().trim().min(3, { message: 'Ім\'я корис�
 const Auth = () => {
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   
   // Login state
@@ -27,6 +30,16 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupUsername, setSignupUsername] = useState('');
+
+  // Check for Steam registration messages
+  useEffect(() => {
+    if (searchParams.get('steam_exists') === 'true') {
+      toast.info('Акаунт з цим Steam ID вже існує. Увійдіть через email.');
+    }
+    if (searchParams.get('steam_registered') === 'true') {
+      toast.success('Реєстрація через Steam успішна! Ви можете увійти.');
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +136,15 @@ const Auth = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Завантаження...' : 'Увійти'}
                 </Button>
+                
+                <div className="relative my-4">
+                  <Separator />
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+                    або
+                  </span>
+                </div>
+                
+                <SteamLoginButton variant="login" onSuccess={() => navigate('/')} />
               </form>
             </TabsContent>
             
@@ -168,6 +190,15 @@ const Auth = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Завантаження...' : 'Зареєструватись'}
                 </Button>
+                
+                <div className="relative my-4">
+                  <Separator />
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+                    або
+                  </span>
+                </div>
+                
+                <SteamLoginButton variant="register" onSuccess={() => navigate('/')} />
               </form>
             </TabsContent>
           </Tabs>
