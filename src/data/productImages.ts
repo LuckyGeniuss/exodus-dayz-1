@@ -2,6 +2,7 @@
 import priorityMonth from '@/assets/products/priority-month.jpg';
 import vehicleGunter from '@/assets/products/vehicle-gunter.jpg';
 import vehicleAda from '@/assets/products/vehicle-ada.jpg';
+import vehicleAdaOfficial from '@/assets/products/vehicle-ada-official.webp';
 import vehicleV3s from '@/assets/products/vehicle-v3s.jpg';
 import vehicleSarka from '@/assets/products/vehicle-sarka.jpg';
 import kitDuo from '@/assets/products/kit-duo.jpg';
@@ -17,8 +18,8 @@ export const productImages: Record<string, string> = {
   'priority-month': priorityMonth,
   'priority-week': priorityMonth, // Same image for week
   'vehicle-gunter': vehicleGunter,
-  'vehicle-ada': vehicleAda,
-  'vehicle-olga': vehicleAda, // Similar vehicle
+  'vehicle-ada': vehicleAdaOfficial,
+  'vehicle-olga': vehicleAdaOfficial, // Similar vehicle
   'vehicle-v3s': vehicleV3s,
   'vehicle-hamer': vehicleGunter, // Similar vehicle
   'vehicle-sarka': vehicleSarka,
