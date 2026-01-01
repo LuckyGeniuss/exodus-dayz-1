@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductManagement from '@/components/admin/ProductManagement';
@@ -10,6 +10,7 @@ import OrderManagement from '@/components/admin/OrderManagement';
 import UserManagement from '@/components/admin/UserManagement';
 import AchievementManagement from '@/components/admin/AchievementManagement';
 import PromoCodeManagement from '@/components/admin/PromoCodeManagement';
+import SettingsManagement from '@/components/admin/SettingsManagement';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -40,7 +41,7 @@ const Admin = () => {
         <h1 className="text-4xl font-military mb-8">Адмін Панель</h1>
 
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Продукти
@@ -60,6 +61,10 @@ const Admin = () => {
             <TabsTrigger value="achievements" className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
               Досягнення
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Налаштування
             </TabsTrigger>
           </TabsList>
 
@@ -81,6 +86,10 @@ const Admin = () => {
 
           <TabsContent value="achievements">
             <AchievementManagement />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <SettingsManagement />
           </TabsContent>
         </Tabs>
       </main>

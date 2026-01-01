@@ -4,6 +4,7 @@ import { ArrowLeft, ShoppingCart, Shield, Package, Tag } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ProductGallery from "@/components/ProductGallery";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -96,15 +97,13 @@ const ProductDetail = () => {
         />
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Product Image */}
-          <div className="space-y-4 animate-fade-in">
-            <div className="aspect-square rounded-lg overflow-hidden bg-muted border border-border group">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-            </div>
+          {/* Product Gallery */}
+          <div className="animate-fade-in">
+            <ProductGallery
+              productId={product.id}
+              mainImage={product.image || '/placeholder.svg'}
+              productName={product.name}
+            />
           </div>
 
           {/* Product Info */}

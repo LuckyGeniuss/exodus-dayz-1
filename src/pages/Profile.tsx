@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Mail, Calendar, Shield, Wallet, Trophy } from 'lucide-react';
+import { User, Mail, Calendar, Shield, Wallet, Trophy, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -17,6 +17,9 @@ import AchievementsModal from '@/components/AchievementsModal';
 import BalanceHistory from '@/components/BalanceHistory';
 import ReferralCard from '@/components/ReferralCard';
 import PromoCodeHistory from '@/components/PromoCodeHistory';
+import { useSteamProfile } from '@/hooks/useSteamProfile';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import SteamIntegrationCard from '@/components/SteamIntegrationCard';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -204,43 +207,11 @@ const Profile = () => {
           </Card>
 
           {/* Steam Card */}
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8z"/>
-                  <path d="M15.5 8.5a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5zm-7-1a4 4 0 0 0-4 4 4 4 0 0 0 4 4l2-2a2 2 0 0 1-2-2 2 2 0 0 1 2-2z"/>
-                </svg>
-                Steam інтеграція
-              </CardTitle>
-              <CardDescription>
-                Підключіть Steam ID для автоматичної доставки товарів
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {profile?.steam_id ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
-                    <div>
-                      <Label>Steam ID</Label>
-                      <div className="text-lg font-mono">{profile.steam_id}</div>
-                    </div>
-                    <Badge variant="default" className="bg-green-600">Підключено</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    ✓ Ваш Steam акаунт успішно підключено. Всі товари будуть автоматично доставлятися на сервер.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    Steam ID не підключено. Підключіть свій акаунт для автоматичної доставки товарів на ігровий сервер.
-                  </p>
-                  <SteamAuthButton userId={user?.id} onSuccess={fetchProfile} />
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <SteamIntegrationCard 
+            profile={profile} 
+            userId={user?.id} 
+            onSuccess={fetchProfile} 
+          />
 
           {/* Discord Card */}
           <Card className="md:col-span-2">
