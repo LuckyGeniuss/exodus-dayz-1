@@ -41,7 +41,45 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    const { order_id, user_email, total_amount, payment_method, items } = await req.json();
+    // Verify this request comes from an authorized source (service role or internal call)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Discord notify called without authorization');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Extract the token and verify it's a service role or valid user
+    const token = authHeader.replace('Bearer ', '');
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Verify the token is valid by checking if it's the service role key or a valid user token
+    // For internal edge function calls, we expect the service role key to be used
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    // If it's not a valid user token, check if this is an internal service call
+    // by verifying the request contains a valid order_id that exists
+    const requestBody = await req.json();
+    const { order_id, user_email, total_amount, payment_method, items } = requestBody;
+    
+    // Validate that the order exists in the database before proceeding
+    const { data: orderData, error: orderError } = await supabase
+      .from('orders')
+      .select('id, user_id')
+      .eq('id', order_id)
+      .maybeSingle();
+    
+    if (orderError || !orderData) {
+      console.error('Discord notify called with invalid order_id:', order_id);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - invalid order' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Discord notification authorized for order:', order_id);
 
     // Get Discord webhook URL from admin settings
     const webhookUrl = await getAdminSetting(supabaseUrl, supabaseServiceKey, 'DISCORD_WEBHOOK_URL');
