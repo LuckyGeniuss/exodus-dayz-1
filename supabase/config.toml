@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.steam-profile]
 verify_jwt = false
 
+[functions.discord-notify]
+verify_jwt = false
+
 [functions.wayforpay-payment]
 verify_jwt = false
 
