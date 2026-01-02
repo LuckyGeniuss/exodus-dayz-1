@@ -318,6 +318,29 @@ Deno.serve(async (req) => {
       console.log('Transaction record created');
     }
 
+    // Send Discord notification (fire and forget)
+    try {
+      const discordUrl = Deno.env.get('SUPABASE_URL') ?? '';
+      await fetch(`${discordUrl}/functions/v1/discord-notify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+        },
+        body: JSON.stringify({
+          order_id: order.id,
+          user_email: user.email,
+          total_amount: finalAmount,
+          payment_method: paymentMethod,
+          items: validatedItems,
+        }),
+      });
+      console.log('Discord notification sent');
+    } catch (discordError) {
+      console.error('Failed to send Discord notification:', discordError);
+      // Don't fail the order if Discord notification fails
+    }
+
     await supabaseClient.from('edge_function_logs').insert({
       user_id: user.id,
       function_name: 'create-order',

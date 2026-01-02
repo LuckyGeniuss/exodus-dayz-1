@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Loader2, Plus, Pencil, Trash2, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
+import ProductImageManager from './ProductImageManager';
 
 interface Product {
   id: string;
@@ -356,6 +357,10 @@ const ProductManagement = () => {
                   <TableCell className="capitalize">{product.category}</TableCell>
                   <TableCell>{product.price.toFixed(2)} ₴</TableCell>
                   <TableCell className="text-right">
+                    <ProductImageManager 
+                      productId={product.id} 
+                      productName={product.name} 
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
