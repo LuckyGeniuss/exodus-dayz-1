@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -15,6 +15,10 @@ import PromoCodeManagement from '@/components/admin/PromoCodeManagement';
 import LoyaltyManagement from '@/components/admin/LoyaltyManagement';
 import FlashSaleManagement from '@/components/admin/FlashSaleManagement';
 import SettingsManagement from '@/components/admin/SettingsManagement';
+import RoleManagement from '@/components/admin/RoleManagement';
+import UserBanManagement from '@/components/admin/UserBanManagement';
+import AuditLogs from '@/components/admin/AuditLogs';
+import SuperAdminSettings from '@/components/admin/SuperAdminSettings';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -66,6 +70,14 @@ const Admin = () => {
               <Users className="h-4 w-4" />
               Користувачі
             </TabsTrigger>
+            <TabsTrigger value="roles" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Ролі
+            </TabsTrigger>
+            <TabsTrigger value="bans" className="flex items-center gap-2">
+              <Ban className="h-4 w-4" />
+              Блокування
+            </TabsTrigger>
             <TabsTrigger value="promo" className="flex items-center gap-2">
               <Tag className="h-4 w-4" />
               Промокоди
@@ -82,9 +94,17 @@ const Admin = () => {
               <Trophy className="h-4 w-4" />
               Досягнення
             </TabsTrigger>
+            <TabsTrigger value="audit" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              Аудит
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Налаштування
+            </TabsTrigger>
+            <TabsTrigger value="api-keys" className="flex items-center gap-2 text-amber-500">
+              <Lock className="h-4 w-4" />
+              API Ключі
             </TabsTrigger>
           </TabsList>
 
@@ -108,6 +128,14 @@ const Admin = () => {
             <UserManagement />
           </TabsContent>
 
+          <TabsContent value="roles">
+            <RoleManagement />
+          </TabsContent>
+
+          <TabsContent value="bans">
+            <UserBanManagement />
+          </TabsContent>
+
           <TabsContent value="promo">
             <PromoCodeManagement />
           </TabsContent>
@@ -124,8 +152,16 @@ const Admin = () => {
             <AchievementManagement />
           </TabsContent>
 
+          <TabsContent value="audit">
+            <AuditLogs />
+          </TabsContent>
+
           <TabsContent value="settings">
             <SettingsManagement />
+          </TabsContent>
+
+          <TabsContent value="api-keys">
+            <SuperAdminSettings />
           </TabsContent>
         </Tabs>
       </main>

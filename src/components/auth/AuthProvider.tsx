@@ -40,16 +40,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) throw error;
+
+      // Check if user is banned
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_banned, banned_reason')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profile?.is_banned) {
+          await supabase.auth.signOut();
+          toast.error(`Ваш акаунт заблоковано. Причина: ${profile.banned_reason || 'Не вказано'}`);
+          throw new Error('Account banned');
+        }
+      }
+
       toast.success('Успішний вхід!');
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || 'Помилка входу');
+      if (error.message !== 'Account banned') {
+        toast.error(error.message || 'Помилка входу');
+      }
       throw error;
     }
   };

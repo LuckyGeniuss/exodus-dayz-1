@@ -47,6 +47,42 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_audit_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          new_value: Json | null
+          old_value: Json | null
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_value?: Json | null
+          old_value?: Json | null
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_value?: Json | null
+          old_value?: Json | null
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
       admin_settings: {
         Row: {
           created_at: string | null
@@ -437,9 +473,12 @@ export type Database = {
         Row: {
           avatar_url: string | null
           balance: number | null
+          banned_at: string | null
+          banned_reason: string | null
           created_at: string | null
           discord_id: string | null
           id: string
+          is_banned: boolean | null
           is_veteran: boolean | null
           referral_code: string | null
           referred_by: string | null
@@ -451,9 +490,12 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           balance?: number | null
+          banned_at?: string | null
+          banned_reason?: string | null
           created_at?: string | null
           discord_id?: string | null
           id: string
+          is_banned?: boolean | null
           is_veteran?: boolean | null
           referral_code?: string | null
           referred_by?: string | null
@@ -465,9 +507,12 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           balance?: number | null
+          banned_at?: string | null
+          banned_reason?: string | null
           created_at?: string | null
           discord_id?: string | null
           id?: string
+          is_banned?: boolean | null
           is_veteran?: boolean | null
           referral_code?: string | null
           referred_by?: string | null
@@ -834,7 +879,7 @@ export type Database = {
       spin_fortune_wheel: { Args: never; Returns: Json }
     }
     Enums: {
-      app_role: "user" | "veteran" | "moderator" | "admin"
+      app_role: "user" | "veteran" | "moderator" | "admin" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -962,7 +1007,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["user", "veteran", "moderator", "admin"],
+      app_role: ["user", "veteran", "moderator", "admin", "super_admin"],
     },
   },
 } as const
