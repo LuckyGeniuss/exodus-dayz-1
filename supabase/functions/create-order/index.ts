@@ -341,6 +341,32 @@ Deno.serve(async (req) => {
       // Don't fail the order if Discord notification fails
     }
 
+    // Send Telegram notification (fire and forget)
+    try {
+      const telegramUrl = Deno.env.get('SUPABASE_URL') ?? '';
+      await fetch(`${telegramUrl}/functions/v1/telegram-notify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+        },
+        body: JSON.stringify({
+          type: 'new_order',
+          data: {
+            order_id: order.id,
+            user_email: user.email,
+            total_amount: finalAmount,
+            payment_method: paymentMethod,
+            items: validatedItems,
+          },
+        }),
+      });
+      console.log('Telegram notification sent');
+    } catch (telegramError) {
+      console.error('Failed to send Telegram notification:', telegramError);
+      // Don't fail the order if Telegram notification fails
+    }
+
     await supabaseClient.from('edge_function_logs').insert({
       user_id: user.id,
       function_name: 'create-order',
