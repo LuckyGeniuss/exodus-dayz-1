@@ -185,6 +185,39 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_levels: {
+        Row: {
+          cashback_percent: number
+          color: string
+          created_at: string | null
+          discount_percent: number
+          icon: string
+          id: string
+          min_spent: number
+          name: string
+        }
+        Insert: {
+          cashback_percent?: number
+          color?: string
+          created_at?: string | null
+          discount_percent?: number
+          icon?: string
+          id?: string
+          min_spent?: number
+          name: string
+        }
+        Update: {
+          cashback_percent?: number
+          color?: string
+          created_at?: string | null
+          discount_percent?: number
+          icon?: string
+          id?: string
+          min_spent?: number
+          name?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -360,6 +393,7 @@ export type Database = {
           referral_code: string | null
           referred_by: string | null
           steam_id: string | null
+          total_spent: number | null
           updated_at: string | null
           username: string | null
         }
@@ -373,6 +407,7 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           steam_id?: string | null
+          total_spent?: number | null
           updated_at?: string | null
           username?: string | null
         }
@@ -386,6 +421,7 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           steam_id?: string | null
+          total_spent?: number | null
           updated_at?: string | null
           username?: string | null
         }
