@@ -1,26 +1,24 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 interface TelegramMessage {
-  chat_id: string;
+  chat_id: string | number;
   text: string;
   parse_mode?: string;
 }
 
-async function getAdminSetting(supabaseUrl: string, supabaseKey: string, key: string): Promise<string | null> {
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data, error } = await supabase
+async function getAdminSetting(supabase: any, key: string): Promise<string | null> {
+  const { data } = await supabase
     .from('admin_settings')
     .select('value')
     .eq('key', key)
     .maybeSingle();
   
-  if (error || !data) return null;
-  return (data as { value: string | null }).value;
+  return data?.value || null;
 }
 
 async function sendTelegramMessage(botToken: string, message: TelegramMessage): Promise<boolean> {
@@ -35,6 +33,7 @@ async function sendTelegramMessage(botToken: string, message: TelegramMessage): 
     });
     
     const result = await response.json();
+    console.log('Telegram API result:', result);
     return result.ok;
   } catch (error) {
     console.error('Telegram API error:', error);
@@ -50,17 +49,91 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { type, data } = await req.json();
+    const { type, action, data, userId, message, orderId } = await req.json();
+    console.log('Telegram notify request:', { type, action, userId, orderId });
 
-    // Get Telegram bot token and chat ID from admin settings
-    const botToken = await getAdminSetting(supabaseUrl, supabaseServiceKey, 'TELEGRAM_BOT_TOKEN');
-    const chatId = await getAdminSetting(supabaseUrl, supabaseServiceKey, 'TELEGRAM_CHAT_ID');
-
-    if (!botToken || !chatId) {
-      console.log('Telegram not configured, skipping notification');
+    const botToken = await getAdminSetting(supabase, 'TELEGRAM_BOT_TOKEN');
+    
+    if (!botToken) {
+      console.log('Telegram bot not configured');
       return new Response(
         JSON.stringify({ success: false, message: 'Telegram not configured' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // User notification (send to user's linked Telegram)
+    if (action && userId) {
+      const { data: telegramUser } = await supabase
+        .from('telegram_users')
+        .select('telegram_id, is_verified')
+        .eq('user_id', userId)
+        .eq('is_verified', true)
+        .single();
+
+      if (!telegramUser) {
+        console.log('User has no verified Telegram');
+        return new Response(
+          JSON.stringify({ success: false, error: 'No Telegram linked' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      let text = '';
+
+      switch (action) {
+        case 'order_created':
+          const { data: order } = await supabase
+            .from('orders')
+            .select('id, final_amount, payment_status')
+            .eq('id', orderId)
+            .single();
+          
+          if (order) {
+            text = `🛒 <b>Нове замовлення!</b>\n\n📋 ID: <code>${order.id.slice(0, 8)}</code>\n💵 Сума: ${order.final_amount} ₴\n\nОплатіть замовлення на сайті.`;
+          }
+          break;
+
+        case 'order_completed':
+          text = `✅ <b>Замовлення оплачено!</b>\n\n📋 ID: <code>${orderId?.slice(0, 8)}</code>\n\nДякуємо за покупку! Товари будуть видані найближчим часом.`;
+          break;
+
+        case 'order_failed':
+          text = `❌ <b>Помилка оплати</b>\n\n📋 ID: <code>${orderId?.slice(0, 8)}</code>\n\nСпробуйте оплатити знову або зверніться до підтримки.`;
+          break;
+
+        case 'ticket_reply':
+          text = `💬 <b>Нова відповідь від підтримки!</b>\n\n${message}\n\nПереглянути на сайті або відповісти тут.`;
+          break;
+
+        case 'balance_topup':
+          text = `💰 <b>Баланс поповнено!</b>\n\n${message}`;
+          break;
+
+        default:
+          text = message || 'Сповіщення від Exodus DayZ Shop';
+      }
+
+      const success = await sendTelegramMessage(botToken, {
+        chat_id: telegramUser.telegram_id,
+        text
+      });
+
+      return new Response(
+        JSON.stringify({ success }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Admin notification (send to admin chat)
+    const chatId = await getAdminSetting(supabase, 'TELEGRAM_CHAT_ID');
+    
+    if (!chatId) {
+      console.log('Admin chat not configured');
+      return new Response(
+        JSON.stringify({ success: false, message: 'Admin chat not configured' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -102,15 +175,15 @@ Deno.serve(async (req) => {
           `🆔 ID: <code>${data.user_id.slice(0, 8)}</code>`;
         break;
 
-      case 'promotion':
-        text = `🎉 <b>Нова акція!</b>\n\n` +
-          `📢 ${data.title}\n` +
-          `💰 Знижка: ${data.discount_percent}%\n` +
-          `📅 До: ${data.end_date || 'Без обмежень'}`;
+      case 'new_ticket':
+        text = `🎫 <b>Новий тікет підтримки!</b>\n\n` +
+          `📋 Тема: ${data.subject}\n` +
+          `👤 Від: ${data.user_email}\n` +
+          `📝 ${data.message}`;
         break;
 
       default:
-        text = `📢 ${data.message || 'Нове сповіщення'}`;
+        text = `📢 ${data?.message || message || 'Нове сповіщення'}`;
     }
 
     const success = await sendTelegramMessage(botToken, {
@@ -118,7 +191,7 @@ Deno.serve(async (req) => {
       text
     });
 
-    console.log('Telegram notification sent:', success);
+    console.log('Admin notification sent:', success);
 
     return new Response(
       JSON.stringify({ success }),

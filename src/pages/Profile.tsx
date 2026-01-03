@@ -22,6 +22,7 @@ import XPProgressCard from '@/components/XPProgressCard';
 import { useSteamProfile } from '@/hooks/useSteamProfile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SteamIntegrationCard from '@/components/SteamIntegrationCard';
+import TelegramLinkCard from '@/components/TelegramLinkCard';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -221,8 +222,14 @@ const Profile = () => {
             onSuccess={fetchProfile} 
           />
 
+          {/* Telegram Card */}
+          <TelegramLinkCard 
+            userId={user?.id} 
+            onSuccess={fetchProfile} 
+          />
+
           {/* Discord Card */}
-          <Card className="md:col-span-2">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">

@@ -28,7 +28,8 @@ const API_KEYS = [
   { key: 'RESEND_API_KEY', label: 'Resend Email API Key', icon: '📧', link: 'https://resend.com' },
   { key: 'DISCORD_WEBHOOK_URL', label: 'Discord Webhook URL', icon: '💬', link: null },
   { key: 'TELEGRAM_BOT_TOKEN', label: 'Telegram Bot Token', icon: '🤖', link: 'https://t.me/BotFather' },
-  { key: 'TELEGRAM_CHAT_ID', label: 'Telegram Chat ID', icon: '📱', link: null },
+  { key: 'TELEGRAM_CHAT_ID', label: 'Telegram Chat ID (Admin)', icon: '📱', link: null },
+  { key: 'TELEGRAM_BOT_USERNAME', label: 'Telegram Bot Username (без @)', icon: '📝', link: null },
 ];
 
 const SuperAdminSettings = () => {
@@ -36,6 +37,7 @@ const SuperAdminSettings = () => {
   const queryClient = useQueryClient();
   const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
+  const [settingWebhook, setSettingWebhook] = useState(false);
 
   const { data: settings, isLoading, refetch } = useQuery({
     queryKey: ['super-admin-settings'],
@@ -251,6 +253,46 @@ const SuperAdminSettings = () => {
           })}
         </div>
 
+        {/* Telegram Webhook Setup */}
+        <div className="p-4 rounded-lg border bg-blue-500/10 border-blue-500/30">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium flex items-center gap-2">
+              🔗 Налаштування Telegram Webhook
+            </h4>
+            <Button
+              onClick={async () => {
+                setSettingWebhook(true);
+                try {
+                  const { data, error } = await supabase.functions.invoke('set-telegram-webhook');
+                  if (error) throw error;
+                  if (data?.success) {
+                    toast.success('Webhook успішно налаштовано!');
+                  } else {
+                    toast.error(data?.error || 'Помилка налаштування webhook');
+                  }
+                } catch (error: any) {
+                  toast.error('Помилка: ' + error.message);
+                } finally {
+                  setSettingWebhook(false);
+                }
+              }}
+              disabled={settingWebhook}
+              variant="outline"
+              className="border-blue-500/50"
+            >
+              {settingWebhook ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Налаштувати Webhook
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Натисніть після збереження Telegram Bot Token, щоб активувати бота для прийому повідомлень.
+          </p>
+        </div>
+
         <div className="mt-6 p-4 rounded-lg bg-muted/50 border">
           <h4 className="font-medium mb-2 flex items-center gap-2">
             <Key className="h-4 w-4" />
@@ -280,8 +322,8 @@ const SuperAdminSettings = () => {
               <strong>Telegram:</strong> Створіть бота через{' '}
               <a href="https://t.me/BotFather" target="_blank" rel="noopener" className="text-primary underline">
                 @BotFather
-              </a>{' '}
-              та отримайте Chat ID через @userinfobot
+              </a>
+              , збережіть токен та натисніть "Налаштувати Webhook"
             </li>
           </ul>
         </div>
