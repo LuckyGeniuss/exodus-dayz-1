@@ -17,6 +17,7 @@ import AchievementsModal from '@/components/AchievementsModal';
 import BalanceHistory from '@/components/BalanceHistory';
 import ReferralCard from '@/components/ReferralCard';
 import PromoCodeHistory from '@/components/PromoCodeHistory';
+import LoyaltyCard from '@/components/LoyaltyCard';
 import { useSteamProfile } from '@/hooks/useSteamProfile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SteamIntegrationCard from '@/components/SteamIntegrationCard';
@@ -205,6 +206,9 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Loyalty Card */}
+          <LoyaltyCard />
 
           {/* Steam Card */}
           <SteamIntegrationCard 
