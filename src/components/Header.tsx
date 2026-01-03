@@ -1,10 +1,12 @@
-import { ShoppingCart, User, LogOut, Wallet, Package, Menu, Shield, Heart } from "lucide-react";
+import { useState } from "react";
+import { ShoppingCart, User, LogOut, Wallet, Package, Menu, Shield, Heart, Disc3 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useWishlist } from "@/hooks/useWishlist";
 import NotificationCenter from "./NotificationCenter";
+import FortuneWheel from "./FortuneWheel";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +30,7 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
   const { isAdmin } = useAdmin();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
+  const [fortuneWheelOpen, setFortuneWheelOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -57,6 +60,19 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
 
           <div className="flex items-center gap-2">
             {user && <NotificationCenter />}
+            
+            {/* Fortune Wheel Button */}
+            {user && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setFortuneWheelOpen(true)}
+                className="relative animate-pulse hover:animate-none"
+                title="Колесо фортуни"
+              >
+                <Disc3 className="h-5 w-5 text-primary" />
+              </Button>
+            )}
             
             <Button 
               variant="outline" 
@@ -137,6 +153,9 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
           </div>
         </div>
       </div>
+      
+      {/* Fortune Wheel Modal */}
+      <FortuneWheel open={fortuneWheelOpen} onOpenChange={setFortuneWheelOpen} />
     </header>
   );
 };

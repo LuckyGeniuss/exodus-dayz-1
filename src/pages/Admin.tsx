@@ -5,10 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import DashboardStats from '@/components/admin/DashboardStats';
+import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import ProductManagement from '@/components/admin/ProductManagement';
-import OrderManagement from '@/components/admin/OrderManagement';
+import OrderManagementEnhanced from '@/components/admin/OrderManagementEnhanced';
 import UserManagement from '@/components/admin/UserManagement';
 import AchievementManagement from '@/components/admin/AchievementManagement';
 import PromoCodeManagement from '@/components/admin/PromoCodeManagement';
@@ -89,7 +89,7 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="dashboard">
-            <DashboardStats />
+            <DashboardStatsEnhanced />
           </TabsContent>
 
           <TabsContent value="analytics">
@@ -101,7 +101,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="orders">
-            <OrderManagement />
+            <OrderManagementEnhanced />
           </TabsContent>
 
           <TabsContent value="users">

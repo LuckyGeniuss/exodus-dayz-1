@@ -212,6 +212,30 @@ export type Database = {
         }
         Relationships: []
       }
+      fortune_wheel_spins: {
+        Row: {
+          id: string
+          prize_type: string
+          prize_value: number
+          spun_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          prize_type: string
+          prize_value?: number
+          spun_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          prize_type?: string
+          prize_value?: number
+          spun_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       loyalty_levels: {
         Row: {
           cashback_percent: number
@@ -780,6 +804,7 @@ export type Database = {
         Args: { current_streak: number }
         Returns: number
       }
+      can_spin_fortune_wheel: { Args: never; Returns: Json }
       check_rate_limit: {
         Args: {
           _endpoint: string
@@ -806,6 +831,7 @@ export type Database = {
         Args: { amount: number; user_id: string }
         Returns: boolean
       }
+      spin_fortune_wheel: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "user" | "veteran" | "moderator" | "admin"

@@ -14,10 +14,12 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import Footer from "@/components/Footer";
 import RecentlyViewedProducts from "@/components/RecentlyViewedProducts";
 import DailyRewardModal from "@/components/DailyRewardModal";
+import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductsRatings } from "@/hooks/useProductsRatings";
 import { useDailyReward } from "@/hooks/useDailyReward";
+import { useSEO } from "@/hooks/useSEO";
 import { Product } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -48,6 +50,14 @@ const Index = () => {
   const { products, loading: productsLoading } = useProducts();
   const { data: ratingsData } = useProductsRatings();
   const { showModal: showDailyReward, setShowModal: setShowDailyReward } = useDailyReward();
+
+  // SEO
+  useSEO({
+    title: 'Магазин',
+    description: 'Офіційний магазин Exodus DayZ - пріоритет, транспорт, набори та косметичні предмети для серверів DayZ. Найкращі ціни та миттєва доставка.',
+    url: '/',
+    type: 'website'
+  });
 
   const maxPrice = useMemo(() => {
     return Math.max(...products.map(p => p.price), 10000);
@@ -270,6 +280,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead includeOrganization canonicalUrl="https://exodus-dayz.lovable.app/" />
       <ShopBanner />
       <Header 
         onCartOpen={() => setCartOpen(true)} 
