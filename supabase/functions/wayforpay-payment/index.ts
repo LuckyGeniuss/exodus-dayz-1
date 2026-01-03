@@ -59,8 +59,24 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const merchantAccount = Deno.env.get('WAYFORPAY_MERCHANT_ACCOUNT')!;
-    const secretKey = Deno.env.get('WAYFORPAY_SECRET_KEY')!;
+    // Try to get settings from admin_settings first, fallback to env vars
+    const { data: settings } = await supabase
+      .from('admin_settings')
+      .select('key, value')
+      .in('key', ['WAYFORPAY_MERCHANT_ACCOUNT', 'WAYFORPAY_SECRET_KEY']);
+
+    const settingsMap = new Map(settings?.map(s => [s.key, s.value]) || []);
+    
+    const merchantAccount = settingsMap.get('WAYFORPAY_MERCHANT_ACCOUNT') || Deno.env.get('WAYFORPAY_MERCHANT_ACCOUNT');
+    const secretKey = settingsMap.get('WAYFORPAY_SECRET_KEY') || Deno.env.get('WAYFORPAY_SECRET_KEY');
+
+    if (!merchantAccount || !secretKey) {
+      console.error('WayForPay credentials not configured');
+      return new Response(
+        JSON.stringify({ error: 'Payment system not configured. Please contact administrator.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const url = new URL(req.url);
     const path = url.pathname;
