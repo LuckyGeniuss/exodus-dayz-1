@@ -146,6 +146,48 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_messages: {
+        Row: {
+          admin_id: string
+          created_at: string
+          failed_count: number | null
+          id: string
+          message: string
+          sent_at: string | null
+          sent_count: number | null
+          status: string
+          target_audience: string
+          title: string
+          type: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          failed_count?: number | null
+          id?: string
+          message: string
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          target_audience?: string
+          title: string
+          type: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          failed_count?: number | null
+          id?: string
+          message?: string
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          target_audience?: string
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           added_at: string | null
@@ -302,6 +344,36 @@ export type Database = {
           id?: string
           min_spent?: number
           name?: string
+        }
+        Relationships: []
+      }
+      message_templates: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          name: string
+          subject: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          name: string
+          subject?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          name?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -750,6 +822,104 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          id: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      telegram_users: {
+        Row: {
+          created_at: string
+          id: string
+          is_verified: boolean | null
+          telegram_id: number
+          telegram_username: string | null
+          user_id: string | null
+          verification_code: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_verified?: boolean | null
+          telegram_id: number
+          telegram_username?: string | null
+          user_id?: string | null
+          verification_code?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_verified?: boolean | null
+          telegram_id?: number
+          telegram_username?: string | null
+          user_id?: string | null
+          verification_code?: string | null
+        }
+        Relationships: []
+      }
+      ticket_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_admin: boolean
+          message: string
+          sender_id: string
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          message: string
+          sender_id: string
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          message?: string
+          sender_id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_achievements: {
         Row: {
