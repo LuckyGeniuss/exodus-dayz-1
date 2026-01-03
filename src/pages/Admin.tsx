@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -19,6 +19,8 @@ import RoleManagement from '@/components/admin/RoleManagement';
 import UserBanManagement from '@/components/admin/UserBanManagement';
 import AuditLogs from '@/components/admin/AuditLogs';
 import SuperAdminSettings from '@/components/admin/SuperAdminSettings';
+import BroadcastManagement from '@/components/admin/BroadcastManagement';
+import SupportTicketManagement from '@/components/admin/SupportTicketManagement';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -94,6 +96,14 @@ const Admin = () => {
               <Trophy className="h-4 w-4" />
               Досягнення
             </TabsTrigger>
+            <TabsTrigger value="support" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Підтримка
+            </TabsTrigger>
+            <TabsTrigger value="broadcast" className="flex items-center gap-2">
+              <Send className="h-4 w-4" />
+              Розсилки
+            </TabsTrigger>
             <TabsTrigger value="audit" className="flex items-center gap-2">
               <History className="h-4 w-4" />
               Аудит
@@ -150,6 +160,14 @@ const Admin = () => {
 
           <TabsContent value="achievements">
             <AchievementManagement />
+          </TabsContent>
+
+          <TabsContent value="support">
+            <SupportTicketManagement />
+          </TabsContent>
+
+          <TabsContent value="broadcast">
+            <BroadcastManagement />
           </TabsContent>
 
           <TabsContent value="audit">

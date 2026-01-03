@@ -20,6 +20,7 @@ import Compare from "./pages/Compare";
 import NotFound from "./pages/NotFound";
 import CompareFloatingPanel from "./components/CompareFloatingPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import SupportChat from "./components/SupportChat";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
             </Routes>
             <CompareFloatingPanel />
             <PWAInstallPrompt />
+            <SupportChat />
           </CompareProvider>
         </AuthProvider>
       </BrowserRouter>
