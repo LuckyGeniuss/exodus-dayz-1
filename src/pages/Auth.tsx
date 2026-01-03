@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/components/auth/AuthProvider';
 import SteamLoginButton from '@/components/auth/SteamLoginButton';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 import { toast } from 'sonner';
 
 // Validation schemas
@@ -143,8 +144,11 @@ const Auth = () => {
                     або
                   </span>
                 </div>
-                
-                <SteamLoginButton variant="login" onSuccess={() => navigate('/')} />
+
+                <div className="space-y-2">
+                  <GoogleAuthButton onSuccess={() => navigate('/')} />
+                  <SteamLoginButton variant="login" onSuccess={() => navigate('/')} />
+                </div>
               </form>
             </TabsContent>
             
@@ -197,8 +201,11 @@ const Auth = () => {
                     або
                   </span>
                 </div>
-                
-                <SteamLoginButton variant="register" onSuccess={() => navigate('/')} />
+
+                <div className="space-y-2">
+                  <GoogleAuthButton onSuccess={() => navigate('/')} />
+                  <SteamLoginButton variant="register" onSuccess={() => navigate('/')} />
+                </div>
               </form>
             </TabsContent>
           </Tabs>
