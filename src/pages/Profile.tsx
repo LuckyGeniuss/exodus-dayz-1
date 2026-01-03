@@ -18,6 +18,7 @@ import BalanceHistory from '@/components/BalanceHistory';
 import ReferralCard from '@/components/ReferralCard';
 import PromoCodeHistory from '@/components/PromoCodeHistory';
 import LoyaltyCard from '@/components/LoyaltyCard';
+import XPProgressCard from '@/components/XPProgressCard';
 import { useSteamProfile } from '@/hooks/useSteamProfile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SteamIntegrationCard from '@/components/SteamIntegrationCard';
@@ -206,6 +207,9 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* XP Progress Card */}
+          <XPProgressCard />
 
           {/* Loyalty Card */}
           <LoyaltyCard />

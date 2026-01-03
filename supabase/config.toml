@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.discord-notify]
 verify_jwt = false
 
+[functions.telegram-notify]
+verify_jwt = false
+
 [functions.wayforpay-payment]
 verify_jwt = false
 
@@ -26,3 +29,6 @@ verify_jwt = false
 
 [functions.send-cart-reminder]
 verify_jwt = false
+
+[functions.send-push-notification]
+verify_jwt = true
