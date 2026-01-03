@@ -13,6 +13,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useViewedProducts } from "@/hooks/useViewedProducts";
 import { usePromotions } from "@/hooks/usePromotions";
 import { useReviews } from "@/hooks/useReviews";
+import { useSEO } from "@/hooks/useSEO";
 import { toast } from "@/hooks/use-toast";
 import { Product } from "@/components/ProductCard";
 import ReviewList from "@/components/ReviewList";
@@ -39,6 +40,24 @@ const ProductDetail = () => {
       addViewedProduct(product.id);
     }
   }, [product]);
+
+  // SEO for product page
+  useSEO({
+    title: product?.name,
+    description: product?.description,
+    image: product?.image,
+    url: `/product/${id}`,
+    type: 'product',
+    product: product ? {
+      name: product.name,
+      price: finalPrice || product.price,
+      description: product.description,
+      image: product.image,
+      category: product.category,
+      rating: averageRating,
+      reviewCount: reviews.length
+    } : undefined
+  });
 
   const handleAddToCart = () => {
     if (!product) return;

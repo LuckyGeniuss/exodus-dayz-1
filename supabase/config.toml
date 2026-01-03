@@ -14,3 +14,15 @@ verify_jwt = false
 
 [functions.nowpayments-payment]
 verify_jwt = false
+
+[functions.send-order-email]
+verify_jwt = true
+
+[functions.send-status-email]
+verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.send-cart-reminder]
+verify_jwt = false
