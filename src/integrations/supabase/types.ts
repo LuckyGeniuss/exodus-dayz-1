@@ -231,6 +231,7 @@ export type Database = {
           id: string
           payment_method: string
           payment_status: string | null
+          steam_id: string | null
           total_amount: number
           user_id: string
         }
@@ -241,6 +242,7 @@ export type Database = {
           id?: string
           payment_method: string
           payment_status?: string | null
+          steam_id?: string | null
           total_amount: number
           user_id: string
         }
@@ -251,6 +253,7 @@ export type Database = {
           id?: string
           payment_method?: string
           payment_status?: string | null
+          steam_id?: string | null
           total_amount?: number
           user_id?: string
         }
