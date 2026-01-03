@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useWishlist } from "@/hooks/useWishlist";
+import NotificationCenter from "./NotificationCenter";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,6 +56,8 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
           </nav>
 
           <div className="flex items-center gap-2">
+            {user && <NotificationCenter />}
+            
             <Button 
               variant="outline" 
               size="icon"

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import VeteranBanner from "@/components/VeteranBanner";
+import ShopBanner from "@/components/ShopBanner";
 import ProductCard from "@/components/ProductCard";
 import ProductSkeleton from "@/components/ProductSkeleton";
 import SearchBar from "@/components/SearchBar";
@@ -265,6 +266,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <ShopBanner />
       <Header 
         onCartOpen={() => setCartOpen(true)} 
         cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}

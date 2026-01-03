@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Loader2, Plus, Pencil, Trash2, Search, Filter } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2, Search, Filter, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import ProductImageManager from './ProductImageManager';
 
@@ -33,12 +34,18 @@ const CATEGORIES = [
   { value: 'custom', label: 'Кастомні предмети' },
 ];
 
+const ITEMS_PER_PAGE = 15;
+
 const ProductManagement = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [editingPriceValue, setEditingPriceValue] = useState('');
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -75,6 +82,12 @@ const ProductManagement = () => {
     });
   }, [products, searchQuery, categoryFilter]);
 
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const createMutation = useMutation({
     mutationFn: async (product: Omit<Product, 'created_at'>) => {
       const { error } = await supabase.from('products').insert(product);
@@ -104,6 +117,7 @@ const ProductManagement = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Продукт оновлено');
       handleCloseDialog();
+      setEditingPriceId(null);
     },
     onError: (error) => {
       toast.error('Помилка оновлення продукту: ' + error.message);
@@ -122,6 +136,22 @@ const ProductManagement = () => {
     },
     onError: (error) => {
       toast.error('Помилка видалення продукту: ' + error.message);
+    },
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from('products').delete().in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(`Видалено ${selectedProducts.size} продуктів`);
+      setSelectedProducts(new Set());
+    },
+    onError: (error) => {
+      toast.error('Помилка видалення: ' + error.message);
     },
   });
 
@@ -157,6 +187,19 @@ const ProductManagement = () => {
     setIsDialogOpen(true);
   };
 
+  const handleDuplicate = (product: Product) => {
+    setEditingProduct(null);
+    setFormData({
+      id: product.id + '-copy',
+      name: product.name + ' (копія)',
+      description: product.description || '',
+      price: product.price.toString(),
+      category: product.category,
+      image: product.image || '',
+    });
+    setIsDialogOpen(true);
+  };
+
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingProduct(null);
@@ -168,6 +211,45 @@ const ProductManagement = () => {
       category: '',
       image: '',
     });
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedProducts(new Set(paginatedProducts.map(p => p.id)));
+    } else {
+      setSelectedProducts(new Set());
+    }
+  };
+
+  const handleSelectProduct = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedProducts);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedProducts(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedProducts.size === 0) return;
+    if (confirm(`Видалити ${selectedProducts.size} обраних продуктів?`)) {
+      bulkDeleteMutation.mutate(Array.from(selectedProducts));
+    }
+  };
+
+  const handleQuickPriceEdit = (product: Product) => {
+    setEditingPriceId(product.id);
+    setEditingPriceValue(product.price.toString());
+  };
+
+  const handleQuickPriceSave = (product: Product) => {
+    const newPrice = parseFloat(editingPriceValue);
+    if (isNaN(newPrice) || newPrice < 0) {
+      toast.error('Невірна ціна');
+      return;
+    }
+    updateMutation.mutate({ ...product, price: newPrice });
   };
 
   if (isLoading) {
@@ -189,117 +271,133 @@ const ProductManagement = () => {
                 Додавайте, редагуйте та видаляйте продукти ({filteredProducts.length} з {products?.length || 0})
               </CardDescription>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => handleCloseDialog()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Додати продукт
+            <div className="flex gap-2">
+              {selectedProducts.size > 0 && (
+                <Button 
+                  variant="destructive" 
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleteMutation.isPending}
+                >
+                  {bulkDeleteMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4 mr-2" />
+                  )}
+                  Видалити ({selectedProducts.size})
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <form onSubmit={handleSubmit}>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingProduct ? 'Редагувати продукт' : 'Новий продукт'}
-                    </DialogTitle>
-                    <DialogDescription>
-                      Заповніть інформацію про продукт
-                    </DialogDescription>
-                  </DialogHeader>
+              )}
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => handleCloseDialog()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Додати продукт
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <form onSubmit={handleSubmit}>
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingProduct ? 'Редагувати продукт' : 'Новий продукт'}
+                      </DialogTitle>
+                      <DialogDescription>
+                        Заповніть інформацію про продукт
+                      </DialogDescription>
+                    </DialogHeader>
 
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="id">ID (унікальний)</Label>
-                      <Input
-                        id="id"
-                        value={formData.id}
-                        onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                        required
-                        disabled={!!editingProduct}
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="name">Назва</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        required
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="description">Опис</Label>
-                      <Textarea
-                        id="description"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="price">Ціна (₴)</Label>
+                        <Label htmlFor="id">ID (унікальний)</Label>
                         <Input
-                          id="price"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={formData.price}
-                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                          id="id"
+                          value={formData.id}
+                          onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                          required
+                          disabled={!!editingProduct}
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="name">Назва</Label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           required
                         />
                       </div>
 
                       <div className="grid gap-2">
-                        <Label htmlFor="category">Категорія</Label>
-                        <Select
-                          value={formData.category}
-                          onValueChange={(value) => setFormData({ ...formData, category: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Оберіть категорію" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="vip">VIP</SelectItem>
-                            <SelectItem value="cosmetic">Косметика</SelectItem>
-                            <SelectItem value="vehicle">Транспорт</SelectItem>
-                            <SelectItem value="clothing">Одяг</SelectItem>
-                            <SelectItem value="cassette">Касети</SelectItem>
-                            <SelectItem value="workshop">Воркшоп</SelectItem>
-                            <SelectItem value="custom">Кастомні предмети</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label htmlFor="description">Опис</Label>
+                        <Textarea
+                          id="description"
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          rows={3}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="price">Ціна (₴)</Label>
+                          <Input
+                            id="price"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={formData.price}
+                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                            required
+                          />
+                        </div>
+
+                        <div className="grid gap-2">
+                          <Label htmlFor="category">Категорія</Label>
+                          <Select
+                            value={formData.category}
+                            onValueChange={(value) => setFormData({ ...formData, category: value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Оберіть категорію" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="vip">VIP</SelectItem>
+                              <SelectItem value="cosmetic">Косметика</SelectItem>
+                              <SelectItem value="vehicle">Транспорт</SelectItem>
+                              <SelectItem value="clothing">Одяг</SelectItem>
+                              <SelectItem value="cassette">Касети</SelectItem>
+                              <SelectItem value="workshop">Воркшоп</SelectItem>
+                              <SelectItem value="custom">Кастомні предмети</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="image">URL зображення</Label>
+                        <Input
+                          id="image"
+                          value={formData.image}
+                          onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                          placeholder="https://..."
+                        />
                       </div>
                     </div>
 
-                    <div className="grid gap-2">
-                      <Label htmlFor="image">URL зображення</Label>
-                      <Input
-                        id="image"
-                        value={formData.image}
-                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                        placeholder="https://..."
-                      />
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                      Скасувати
-                    </Button>
-                    <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                      {(createMutation.isPending || updateMutation.isPending) && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      {editingProduct ? 'Зберегти' : 'Створити'}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={handleCloseDialog}>
+                        Скасувати
+                      </Button>
+                      <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                        {(createMutation.isPending || updateMutation.isPending) && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {editingProduct ? 'Зберегти' : 'Створити'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
           
           {/* Search and Filter */}
@@ -309,11 +407,11 @@ const ProductManagement = () => {
               <Input
                 placeholder="Пошук за назвою або ID..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                 className="pl-9"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setCurrentPage(1); }}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Категорія" />
@@ -333,6 +431,12 @@ const ProductManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox 
+                  checked={paginatedProducts.length > 0 && paginatedProducts.every(p => selectedProducts.has(p.id))}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
               <TableHead>ID</TableHead>
               <TableHead>Назва</TableHead>
               <TableHead>Категорія</TableHead>
@@ -341,26 +445,68 @@ const ProductManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredProducts.length === 0 ? (
+            {paginatedProducts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   {searchQuery || categoryFilter !== 'all' 
                     ? 'Товарів за цими критеріями не знайдено' 
                     : 'Немає товарів'}
                 </TableCell>
               </TableRow>
             ) : (
-              filteredProducts.map((product) => (
+              paginatedProducts.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <Checkbox 
+                      checked={selectedProducts.has(product.id)}
+                      onCheckedChange={(checked) => handleSelectProduct(product.id, !!checked)}
+                    />
+                  </TableCell>
                   <TableCell className="font-mono text-sm">{product.id}</TableCell>
                   <TableCell>{product.name}</TableCell>
                   <TableCell className="capitalize">{product.category}</TableCell>
-                  <TableCell>{product.price.toFixed(2)} ₴</TableCell>
+                  <TableCell>
+                    {editingPriceId === product.id ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={editingPriceValue}
+                          onChange={(e) => setEditingPriceValue(e.target.value)}
+                          className="w-24 h-8"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleQuickPriceSave(product);
+                            if (e.key === 'Escape') setEditingPriceId(null);
+                          }}
+                        />
+                        <Button size="sm" variant="ghost" onClick={() => handleQuickPriceSave(product)}>
+                          ✓
+                        </Button>
+                      </div>
+                    ) : (
+                      <span 
+                        className="cursor-pointer hover:underline" 
+                        onClick={() => handleQuickPriceEdit(product)}
+                        title="Натисніть для редагування"
+                      >
+                        {product.price.toFixed(2)} ₴
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <ProductImageManager 
                       productId={product.id} 
                       productName={product.name} 
                     />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDuplicate(product)}
+                      title="Копіювати"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -385,6 +531,36 @@ const ProductManagement = () => {
             )}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <p className="text-sm text-muted-foreground">
+              Показано {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} з {filteredProducts.length}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm">
+                {currentPage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
