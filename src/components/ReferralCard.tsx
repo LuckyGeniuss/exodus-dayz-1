@@ -5,12 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useReferral } from '@/hooks/useReferral';
-import { Users, Copy, Gift, Check } from 'lucide-react';
+import { Users, Copy, Gift, Check, Clock, CheckCircle2 } from 'lucide-react';
 
 const ReferralCard = () => {
   const { 
     referralCode, 
     referralCount, 
+    referralBonusTotal,
+    pendingBonuses,
+    hasUsedReferral,
     loading, 
     applyReferralCode,
     getReferralLink,
@@ -90,18 +93,35 @@ const ReferralCard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 py-4 border-y">
+        <div className="grid grid-cols-3 gap-3 py-4 border-y">
           <div className="text-center">
-            <div className="text-3xl font-bold text-primary">{referralCount}</div>
-            <div className="text-sm text-muted-foreground">Запрошених друзів</div>
+            <div className="text-2xl font-bold text-primary">{referralCount}</div>
+            <div className="text-xs text-muted-foreground">Запрошено</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-green-500">
-              {referralCount * REFERRAL_BONUS}₴
+            <div className="text-2xl font-bold text-green-500">
+              {referralBonusTotal}₴
             </div>
-            <div className="text-sm text-muted-foreground">Зароблено</div>
+            <div className="text-xs text-muted-foreground">Отримано</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-500">{pendingBonuses}</div>
+            <div className="text-xs text-muted-foreground">Очікують</div>
           </div>
         </div>
+
+        {/* Pending bonuses info */}
+        {pendingBonuses > 0 && (
+          <div className="flex items-start gap-3 p-3 bg-orange-500/10 rounded-lg">
+            <Clock className="h-5 w-5 text-orange-500 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-orange-500">{pendingBonuses} друзів очікують</p>
+              <p className="text-muted-foreground">
+                Бонус буде нараховано після їх першої покупки
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Bonus info */}
         <div className="flex items-start gap-3 p-4 bg-primary/10 rounded-lg">
@@ -114,25 +134,32 @@ const ReferralCard = () => {
           </div>
         </div>
 
-        {/* Apply code */}
-        <div className="space-y-3 pt-4 border-t">
-          <Label>Маєте реферальний код?</Label>
-          <div className="flex gap-2">
-            <Input
-              value={inputCode}
-              onChange={(e) => setInputCode(e.target.value.toUpperCase())}
-              placeholder="Введіть код"
-              className="font-mono uppercase"
-              maxLength={8}
-            />
-            <Button 
-              onClick={handleApplyCode}
-              disabled={applying || !inputCode.trim()}
-            >
-              {applying ? '...' : 'Застосувати'}
-            </Button>
+        {/* Apply code - only show if user hasn't used a referral yet */}
+        {!hasUsedReferral ? (
+          <div className="space-y-3 pt-4 border-t">
+            <Label>Маєте реферальний код?</Label>
+            <div className="flex gap-2">
+              <Input
+                value={inputCode}
+                onChange={(e) => setInputCode(e.target.value.toUpperCase())}
+                placeholder="Введіть код"
+                className="font-mono uppercase"
+                maxLength={8}
+              />
+              <Button 
+                onClick={handleApplyCode}
+                disabled={applying || !inputCode.trim()}
+              >
+                {applying ? '...' : 'Застосувати'}
+              </Button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-2 pt-4 border-t text-sm text-muted-foreground">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            Ви вже зареєстровані по реферальному коду
+          </div>
+        )}
       </CardContent>
     </Card>
   );

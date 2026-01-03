@@ -9,6 +9,9 @@ export const useReferral = () => {
   const { user } = useAuth();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
+  const [referralBonusTotal, setReferralBonusTotal] = useState(0);
+  const [pendingBonuses, setPendingBonuses] = useState(0);
+  const [hasUsedReferral, setHasUsedReferral] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,21 +27,28 @@ export const useReferral = () => {
       // Get user's referral code
       const { data: profile } = await supabase
         .from('profiles')
-        .select('referral_code')
+        .select('referral_code, referred_by')
         .eq('id', user.id)
         .single();
 
       if (profile?.referral_code) {
         setReferralCode(profile.referral_code);
       }
+      
+      setHasUsedReferral(!!profile?.referred_by);
 
-      // Get referral count
-      const { count } = await supabase
+      // Get referral stats
+      const { data: referrals } = await supabase
         .from('referrals')
-        .select('*', { count: 'exact', head: true })
+        .select('id, bonus_given')
         .eq('referrer_id', user.id);
 
-      setReferralCount(count || 0);
+      if (referrals) {
+        setReferralCount(referrals.length);
+        const completedBonuses = referrals.filter(r => r.bonus_given).length;
+        setReferralBonusTotal(completedBonuses * REFERRAL_BONUS);
+        setPendingBonuses(referrals.length - completedBonuses);
+      }
     } catch (err) {
       console.error('Error fetching referral data:', err);
     } finally {
@@ -124,6 +134,9 @@ export const useReferral = () => {
   return {
     referralCode,
     referralCount,
+    referralBonusTotal,
+    pendingBonuses,
+    hasUsedReferral,
     loading,
     applyReferralCode,
     getReferralLink,

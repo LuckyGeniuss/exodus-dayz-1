@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStats from '@/components/admin/DashboardStats';
@@ -13,6 +13,7 @@ import UserManagement from '@/components/admin/UserManagement';
 import AchievementManagement from '@/components/admin/AchievementManagement';
 import PromoCodeManagement from '@/components/admin/PromoCodeManagement';
 import LoyaltyManagement from '@/components/admin/LoyaltyManagement';
+import FlashSaleManagement from '@/components/admin/FlashSaleManagement';
 import SettingsManagement from '@/components/admin/SettingsManagement';
 
 const Admin = () => {
@@ -69,6 +70,10 @@ const Admin = () => {
               <Tag className="h-4 w-4" />
               Промокоди
             </TabsTrigger>
+            <TabsTrigger value="flash-sales" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Flash Sale
+            </TabsTrigger>
             <TabsTrigger value="loyalty" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Лояльність
@@ -105,6 +110,10 @@ const Admin = () => {
 
           <TabsContent value="promo">
             <PromoCodeManagement />
+          </TabsContent>
+
+          <TabsContent value="flash-sales">
+            <FlashSaleManagement />
           </TabsContent>
 
           <TabsContent value="loyalty">

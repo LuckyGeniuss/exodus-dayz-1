@@ -8,6 +8,8 @@ export interface Promotion {
   start_date: string;
   end_date: string | null;
   is_active: boolean;
+  is_flash_sale?: boolean;
+  flash_title?: string | null;
 }
 
 export const usePromotions = () => {
@@ -39,5 +41,9 @@ export const usePromotions = () => {
     return promotions.find(p => p.product_id === productId);
   };
 
-  return { promotions, loading, getProductPromotion };
+  const getFlashSales = () => {
+    return promotions.filter(p => p.is_flash_sale && p.end_date && new Date(p.end_date) > new Date());
+  };
+
+  return { promotions, loading, getProductPromotion, getFlashSales };
 };
