@@ -1,11 +1,13 @@
-import { ShoppingCart, Heart, Tag, Star, Eye, Zap } from "lucide-react";
+import { ShoppingCart, Heart, Tag, Star, Eye, Zap, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { useWishlist } from "@/hooks/useWishlist";
 import { usePromotions } from "@/hooks/usePromotions";
+import { useCompare } from "@/contexts/CompareContext";
 import FlashSaleBadge from "./FlashSaleBadge";
+import { toast } from "sonner";
 export interface Product {
   id: string;
   name: string;
@@ -60,12 +62,28 @@ const getCategoryColor = (category: string): string => {
 const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { getProductPromotion } = usePromotions();
+  const { addToCompare, removeFromCompare, isInCompare, canAddMore } = useCompare();
   const inWishlist = isInWishlist(product.id);
+  const inCompare = isInCompare(product.id);
   const promotion = getProductPromotion(product.id);
   
   const finalPrice = promotion 
     ? product.price * (1 - promotion.discount_percent / 100)
     : product.price;
+
+  const handleCompareToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (inCompare) {
+      removeFromCompare(product.id);
+      toast.info('Видалено з порівняння');
+    } else if (canAddMore) {
+      addToCompare(product);
+      toast.success('Додано до порівняння');
+    } else {
+      toast.warning('Максимум 4 товари для порівняння');
+    }
+  };
 
   return (
     <Link to={`/product/${product.id}`} className="animate-fade-in block h-full">
@@ -114,7 +132,19 @@ const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
               />
             </Button>
 
-            {/* Product Image */}
+            {/* Compare Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCompareToggle}
+              className={`absolute top-14 right-3 z-10 h-10 w-10 p-0 rounded-full backdrop-blur-sm shadow-lg transition-all duration-300 ${
+                inCompare 
+                  ? 'bg-blue-500/90 hover:bg-blue-500 text-white' 
+                  : 'bg-background/80 hover:bg-background text-muted-foreground hover:text-blue-500'
+              }`}
+            >
+              <Scale className={`h-5 w-5 transition-transform duration-300 group-hover:scale-110`} />
+            </Button>
             <img
               src={product.image}
               alt={product.name}

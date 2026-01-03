@@ -12,9 +12,12 @@ import Pagination from "@/components/Pagination";
 import EmptyState from "@/components/EmptyState";
 import CartDrawer from "@/components/cart/CartDrawer";
 import Footer from "@/components/Footer";
+import RecentlyViewedProducts from "@/components/RecentlyViewedProducts";
+import DailyRewardModal from "@/components/DailyRewardModal";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductsRatings } from "@/hooks/useProductsRatings";
+import { useDailyReward } from "@/hooks/useDailyReward";
 import { Product } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,6 +47,7 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const { products, loading: productsLoading } = useProducts();
   const { data: ratingsData } = useProductsRatings();
+  const { showModal: showDailyReward, setShowModal: setShowDailyReward } = useDailyReward();
 
   const maxPrice = useMemo(() => {
     return Math.max(...products.map(p => p.price), 10000);
@@ -283,6 +287,12 @@ const Index = () => {
       <Hero />
       <VeteranBanner />
       
+      {/* Daily Reward Modal */}
+      <DailyRewardModal 
+        open={showDailyReward} 
+        onOpenChange={setShowDailyReward} 
+      />
+      
       <section id="shop" className="container mx-auto px-4 py-20">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">
@@ -359,6 +369,9 @@ const Index = () => {
             )}
           </div>
         </div>
+        
+        {/* Recently Viewed Products */}
+        <RecentlyViewedProducts />
       </section>
 
       <section id="about" className="bg-card border-y border-border py-20">

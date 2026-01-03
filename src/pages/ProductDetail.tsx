@@ -17,6 +17,7 @@ import { toast } from "@/hooks/use-toast";
 import { Product } from "@/components/ProductCard";
 import ReviewList from "@/components/ReviewList";
 import ReviewForm from "@/components/ReviewForm";
+import RecentlyViewedProducts from "@/components/RecentlyViewedProducts";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -196,6 +197,11 @@ const ProductDetail = () => {
               onDeleteReview={deleteReview}
             />
           </div>
+        </div>
+
+        {/* Recently Viewed Products */}
+        <div className="mt-16">
+          <RecentlyViewedProducts currentProductId={product.id} maxItems={4} />
         </div>
 
         <Separator className="my-20" />

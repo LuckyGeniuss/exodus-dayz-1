@@ -140,6 +140,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_rewards: {
+        Row: {
+          created_at: string
+          id: string
+          last_claim: string
+          streak: number
+          total_claimed: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_claim?: string
+          streak?: number
+          total_claimed?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_claim?: string
+          streak?: number
+          total_claimed?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       edge_function_logs: {
         Row: {
           created_at: string
@@ -749,6 +776,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_daily_bonus: {
+        Args: { current_streak: number }
+        Returns: number
+      }
       check_rate_limit: {
         Args: {
           _endpoint: string
@@ -759,6 +790,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_daily_bonus: { Args: never; Returns: Json }
       deduct_balance: {
         Args: { amount: number; user_id: string }
         Returns: undefined
