@@ -28,6 +28,8 @@ const SETTING_ICONS: Record<string, string> = {
   'NOWPAYMENTS_IPN_SECRET': '🔗',
   'RESEND_API_KEY': '📧',
   'DISCORD_WEBHOOK_URL': '💬',
+  'TELEGRAM_BOT_TOKEN': '🤖',
+  'TELEGRAM_CHAT_ID': '📱',
 };
 
 const SHOP_SETTINGS = [
@@ -335,6 +337,8 @@ const SettingsManagement = () => {
                 <li>• <strong>NOWPayments</strong> - отримайте на <a href="https://nowpayments.io" target="_blank" rel="noopener" className="text-primary underline">NOWPayments Dashboard</a></li>
                 <li>• <strong>Resend</strong> - отримайте на <a href="https://resend.com" target="_blank" rel="noopener" className="text-primary underline">Resend Dashboard</a></li>
                 <li>• <strong>Discord Webhook</strong> - створіть у налаштуваннях Discord каналу</li>
+                <li>• <strong>Telegram Bot Token</strong> - отримайте через <a href="https://t.me/BotFather" target="_blank" rel="noopener" className="text-primary underline">@BotFather</a></li>
+                <li>• <strong>Telegram Chat ID</strong> - ID чату/групи для сповіщень (отримайте через @userinfobot)</li>
               </ul>
             </div>
           </CardContent>

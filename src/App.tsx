@@ -19,6 +19,7 @@ import Wishlist from "./pages/Wishlist";
 import Compare from "./pages/Compare";
 import NotFound from "./pages/NotFound";
 import CompareFloatingPanel from "./components/CompareFloatingPanel";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <CompareFloatingPanel />
+            <PWAInstallPrompt />
           </CompareProvider>
         </AuthProvider>
       </BrowserRouter>
