@@ -510,8 +510,10 @@ export type Database = {
           created_at: string
           discount_percent: number
           end_date: string | null
+          flash_title: string | null
           id: string
           is_active: boolean
+          is_flash_sale: boolean | null
           product_id: string
           start_date: string
         }
@@ -519,8 +521,10 @@ export type Database = {
           created_at?: string
           discount_percent: number
           end_date?: string | null
+          flash_title?: string | null
           id?: string
           is_active?: boolean
+          is_flash_sale?: boolean | null
           product_id: string
           start_date?: string
         }
@@ -528,8 +532,10 @@ export type Database = {
           created_at?: string
           discount_percent?: number
           end_date?: string | null
+          flash_title?: string | null
           id?: string
           is_active?: boolean
+          is_flash_sale?: boolean | null
           product_id?: string
           start_date?: string
         }

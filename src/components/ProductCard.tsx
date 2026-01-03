@@ -1,11 +1,11 @@
-import { ShoppingCart, Heart, Tag, Star, Eye } from "lucide-react";
+import { ShoppingCart, Heart, Tag, Star, Eye, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { useWishlist } from "@/hooks/useWishlist";
 import { usePromotions } from "@/hooks/usePromotions";
-
+import FlashSaleBadge from "./FlashSaleBadge";
 export interface Product {
   id: string;
   name: string;
@@ -75,10 +75,20 @@ const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
             {/* Promotion Badge */}
             {promotion && (
               <div className="absolute top-3 left-3 z-10">
-                <Badge className="bg-destructive/90 text-destructive-foreground backdrop-blur-sm shadow-lg px-3 py-1.5 font-bold">
-                  <Tag className="w-3.5 h-3.5 mr-1.5" />
-                  -{promotion.discount_percent}%
-                </Badge>
+                {promotion.is_flash_sale && promotion.end_date ? (
+                  <div className="flex flex-col gap-1">
+                    <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white backdrop-blur-sm shadow-lg px-3 py-1.5 font-bold animate-pulse">
+                      <Zap className="w-3.5 h-3.5 mr-1.5" />
+                      -{promotion.discount_percent}%
+                    </Badge>
+                    <FlashSaleBadge endDate={promotion.end_date} discountPercent={promotion.discount_percent} variant="timer" />
+                  </div>
+                ) : (
+                  <Badge className="bg-destructive/90 text-destructive-foreground backdrop-blur-sm shadow-lg px-3 py-1.5 font-bold">
+                    <Tag className="w-3.5 h-3.5 mr-1.5" />
+                    -{promotion.discount_percent}%
+                  </Badge>
+                )}
               </div>
             )}
             
