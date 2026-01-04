@@ -17,6 +17,7 @@ import Admin from "./pages/Admin";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
 import Compare from "./pages/Compare";
+import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import CompareFloatingPanel from "./components/CompareFloatingPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/compare" element={<Compare />} />
+              <Route path="/support" element={<Support />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />

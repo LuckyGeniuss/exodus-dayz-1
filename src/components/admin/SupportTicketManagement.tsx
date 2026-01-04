@@ -166,6 +166,27 @@ const SupportTicketManagement = () => {
           .update({ status: 'in_progress', updated_at: new Date().toISOString() })
           .eq('id', selectedTicket.id);
       }
+
+      // Send Telegram notification to user
+      await supabase.functions.invoke('telegram-notify', {
+        body: {
+          action: 'ticket_reply',
+          userId: selectedTicket.user_id,
+          message: replyMessage.slice(0, 200) + (replyMessage.length > 200 ? '...' : '')
+        }
+      });
+
+      // Send push notification
+      await supabase.functions.invoke('send-push-notification', {
+        body: {
+          user_id: selectedTicket.user_id,
+          payload: {
+            title: 'Відповідь від підтримки',
+            body: replyMessage.slice(0, 100) + (replyMessage.length > 100 ? '...' : ''),
+            url: '/support'
+          }
+        }
+      });
     },
     onSuccess: () => {
       setReplyMessage('');

@@ -23,6 +23,7 @@ import { useSteamProfile } from '@/hooks/useSteamProfile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SteamIntegrationCard from '@/components/SteamIntegrationCard';
 import TelegramLinkCard from '@/components/TelegramLinkCard';
+import PushNotificationSettings from '@/components/PushNotificationSettings';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -271,6 +272,9 @@ const Profile = () => {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Push Notifications */}
+          <PushNotificationSettings />
 
           {/* Promo Code History */}
           <PromoCodeHistory />
