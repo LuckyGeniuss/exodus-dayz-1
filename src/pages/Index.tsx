@@ -15,11 +15,14 @@ import Footer from "@/components/Footer";
 import RecentlyViewedProducts from "@/components/RecentlyViewedProducts";
 import DailyRewardModal from "@/components/DailyRewardModal";
 import SEOHead from "@/components/SEOHead";
+import BundleShowcase from "@/components/BundleShowcase";
+import NewsFeed from "@/components/NewsFeed";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductsRatings } from "@/hooks/useProductsRatings";
 import { useDailyReward } from "@/hooks/useDailyReward";
 import { useSEO } from "@/hooks/useSEO";
+import { useRealtimeOrders, useRealtimeNotifications } from "@/hooks/useRealtime";
 import { Product } from "@/components/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -31,6 +34,10 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Realtime subscriptions
+  useRealtimeOrders();
+  useRealtimeNotifications();
   
   // Parse URL params
   const initialCategories = (searchParams.get('categories')?.split(',').filter(Boolean) || []) as Category[];
@@ -384,6 +391,12 @@ const Index = () => {
         {/* Recently Viewed Products */}
         <RecentlyViewedProducts />
       </section>
+
+      {/* Bundles Section */}
+      <BundleShowcase onAddToCart={addToCart} />
+
+      {/* News Section */}
+      <NewsFeed limit={3} />
 
       <section id="about" className="bg-card border-y border-border py-20">
         <div className="container mx-auto px-4">

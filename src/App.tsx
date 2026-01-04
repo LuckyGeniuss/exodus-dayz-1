@@ -20,6 +20,7 @@ import Wishlist from "./pages/Wishlist";
 import Compare from "./pages/Compare";
 import Support from "./pages/Support";
 import FAQ from "./pages/FAQ";
+import { NewsListPage, NewsPostPage } from "./pages/News";
 import NotFound from "./pages/NotFound";
 import CompareFloatingPanel from "./components/CompareFloatingPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -50,6 +51,8 @@ const App = () => (
                 <Route path="/compare" element={<Compare />} />
                 <Route path="/support" element={<Support />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/news" element={<NewsListPage />} />
+                <Route path="/news/:id" element={<NewsPostPage />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />
