@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart, Image, Clock } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart, Image, Clock, FolderOpen, LineChart } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -31,6 +31,8 @@ import NewsManagement from '@/components/admin/NewsManagement';
 import ProductAnalytics from '@/components/admin/ProductAnalytics';
 import BannerManagement from '@/components/admin/BannerManagement';
 import CronJobsManagement from '@/components/admin/CronJobsManagement';
+import CategoryManagement from '@/components/admin/CategoryManagement';
+import EmailStatsDetails from '@/components/admin/EmailStatsDetails';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -77,6 +79,10 @@ const Admin = () => {
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Продукти
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="flex items-center gap-2">
+              <FolderOpen className="h-4 w-4" />
+              Категорії
             </TabsTrigger>
             <TabsTrigger value="bundles" className="flex items-center gap-2">
               <Gift className="h-4 w-4" />
@@ -154,6 +160,10 @@ const Admin = () => {
               <Mail className="h-4 w-4" />
               Email
             </TabsTrigger>
+            <TabsTrigger value="email-stats" className="flex items-center gap-2">
+              <LineChart className="h-4 w-4" />
+              Email Stats
+            </TabsTrigger>
             <TabsTrigger value="cron-jobs" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Cron
@@ -182,6 +192,10 @@ const Admin = () => {
 
           <TabsContent value="products">
             <ProductManagement />
+          </TabsContent>
+
+          <TabsContent value="categories">
+            <CategoryManagement />
           </TabsContent>
 
           <TabsContent value="bundles">
@@ -258,6 +272,10 @@ const Admin = () => {
 
           <TabsContent value="email-campaigns">
             <EmailCampaignManager />
+          </TabsContent>
+
+          <TabsContent value="email-stats">
+            <EmailStatsDetails />
           </TabsContent>
 
           <TabsContent value="settings">
