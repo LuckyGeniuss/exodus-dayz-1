@@ -33,6 +33,7 @@ interface Banner {
 interface Profile {
   id: string;
   username: string | null;
+  email_promotions_enabled: boolean | null;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -94,12 +95,18 @@ const handler = async (req: Request): Promise<Response> => {
 
     const usersWithEmail = authUsers.users.filter(u => u.email);
 
-    // Get user profiles for usernames
+    // Get user profiles for usernames and email preferences
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, username") as { data: Profile[] | null };
+      .select("id, username, email_promotions_enabled") as { data: Profile[] | null };
 
-    const profileMap = new Map(profiles?.map(p => [p.id, p.username]) || []);
+    const profileMap = new Map(profiles?.map(p => [p.id, { username: p.username, emailEnabled: p.email_promotions_enabled !== false }]) || []);
+
+    // Filter users who have email notifications enabled
+    const eligibleUsers = usersWithEmail.filter(u => {
+      const profile = profileMap.get(u.id);
+      return profile?.emailEnabled !== false;
+    });
 
     // Build email content
     let promotionsList = "";
@@ -162,12 +169,30 @@ const handler = async (req: Request): Promise<Response> => {
       `;
     }
 
+    // Create notification log entry
+    const { data: logEntry } = await supabase
+      .from("notification_logs")
+      .insert({
+        type: "ending_promotions",
+        recipients_count: eligibleUsers.length,
+        sent_count: 0,
+        failed_count: 0,
+        details: {
+          endingPromotions: endingPromotions?.length || 0,
+          endingFlashSales: endingFlashSales?.length || 0,
+          endingBanners: endingBanners?.length || 0,
+        },
+      })
+      .select()
+      .single();
+
     let sentCount = 0;
     let failedCount = 0;
 
-    // Send emails to all users
-    for (const user of usersWithEmail) {
-      const username = profileMap.get(user.id) || "Виживач";
+    // Send emails to eligible users
+    for (const user of eligibleUsers) {
+      const profile = profileMap.get(user.id);
+      const username = profile?.username || "Виживач";
       
       try {
         await resend.emails.send({
@@ -200,7 +225,8 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <p style="color: #71717a; font-size: 12px; text-align: center; margin-top: 30px;">
-                Ви отримали цей лист, оскільки підписані на сповіщення Exodus DayZ.
+                Ви отримали цей лист, оскільки підписані на сповіщення про акції Exodus DayZ.<br>
+                Ви можете відписатися в налаштуваннях профілю.
               </p>
             </div>
           `,
@@ -212,8 +238,20 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Create notifications in database for each user
-    for (const user of usersWithEmail) {
+    // Update notification log
+    if (logEntry) {
+      await supabase
+        .from("notification_logs")
+        .update({
+          sent_count: sentCount,
+          failed_count: failedCount,
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", logEntry.id);
+    }
+
+    // Create in-app notifications for eligible users
+    for (const user of eligibleUsers) {
       await supabase.from("notifications").insert({
         user_id: user.id,
         type: "promotion",
