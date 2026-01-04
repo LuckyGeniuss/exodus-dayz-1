@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart, Image } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -29,6 +29,7 @@ import BundleManagement from '@/components/admin/BundleManagement';
 import InventoryManagement from '@/components/admin/InventoryManagement';
 import NewsManagement from '@/components/admin/NewsManagement';
 import ProductAnalytics from '@/components/admin/ProductAnalytics';
+import BannerManagement from '@/components/admin/BannerManagement';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -119,6 +120,10 @@ const Admin = () => {
             <TabsTrigger value="news" className="flex items-center gap-2">
               <Newspaper className="h-4 w-4" />
               Новини
+            </TabsTrigger>
+            <TabsTrigger value="banners" className="flex items-center gap-2">
+              <Image className="h-4 w-4" />
+              Банери
             </TabsTrigger>
             <TabsTrigger value="support" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
@@ -216,6 +221,10 @@ const Admin = () => {
 
           <TabsContent value="news">
             <NewsManagement />
+          </TabsContent>
+
+          <TabsContent value="banners">
+            <BannerManagement />
           </TabsContent>
 
           <TabsContent value="support">

@@ -14,6 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_test_results: {
+        Row: {
+          conversion_value: number | null
+          converted: boolean | null
+          created_at: string | null
+          id: string
+          session_id: string | null
+          test_id: string
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          conversion_value?: number | null
+          converted?: boolean | null
+          created_at?: string | null
+          id?: string
+          session_id?: string | null
+          test_id: string
+          user_id?: string | null
+          variant: string
+        }
+        Update: {
+          conversion_value?: number | null
+          converted?: boolean | null
+          created_at?: string | null
+          id?: string
+          session_id?: string | null
+          test_id?: string
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_test_results_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ab_tests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ab_test_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_tests: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          start_date: string | null
+          traffic_split: number | null
+          variant_a: Json
+          variant_b: Json
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          start_date?: string | null
+          traffic_split?: number | null
+          variant_a: Json
+          variant_b: Json
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          start_date?: string | null
+          traffic_split?: number | null
+          variant_a?: Json
+          variant_b?: Json
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           created_at: string | null
@@ -145,6 +232,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      birthday_coupons: {
+        Row: {
+          created_at: string | null
+          id: string
+          promo_code_id: string | null
+          sent_at: string | null
+          used_at: string | null
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          promo_code_id?: string | null
+          sent_at?: string | null
+          used_at?: string | null
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          promo_code_id?: string | null
+          sent_at?: string | null
+          used_at?: string | null
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "birthday_coupons_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promo_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "birthday_coupons_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       broadcast_messages: {
         Row: {
@@ -322,6 +454,107 @@ export type Database = {
         }
         Relationships: []
       }
+      email_campaigns: {
+        Row: {
+          body: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          name: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string
+          target_audience: string | null
+          total_clicked: number | null
+          total_opened: number | null
+          total_recipients: number | null
+          total_sent: number | null
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          target_audience?: string | null
+          total_clicked?: number | null
+          total_opened?: number | null
+          total_recipients?: number | null
+          total_sent?: number | null
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          target_audience?: string | null
+          total_clicked?: number | null
+          total_opened?: number | null
+          total_recipients?: number | null
+          total_sent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flash_sales: {
+        Row: {
+          created_at: string | null
+          current_uses: number | null
+          description: string | null
+          discount_percent: number
+          end_date: string
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          product_ids: string[]
+          start_date: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_percent: number
+          end_date: string
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          product_ids?: string[]
+          start_date: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          current_uses?: number | null
+          description?: string | null
+          discount_percent?: number
+          end_date?: string
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          product_ids?: string[]
+          start_date?: string
+          title?: string
+        }
+        Relationships: []
+      }
       fortune_wheel_spins: {
         Row: {
           id: string
@@ -343,6 +576,60 @@ export type Database = {
           prize_value?: number
           spun_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      homepage_banners: {
+        Row: {
+          background_gradient: string | null
+          badge_color: string | null
+          badge_text: string | null
+          created_at: string | null
+          display_order: number | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          link_text: string | null
+          link_url: string | null
+          start_date: string | null
+          subtitle: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          background_gradient?: string | null
+          badge_color?: string | null
+          badge_text?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          link_text?: string | null
+          link_url?: string | null
+          start_date?: string | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          background_gradient?: string | null
+          badge_color?: string | null
+          badge_text?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          link_text?: string | null
+          link_url?: string | null
+          start_date?: string | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -831,6 +1118,7 @@ export type Database = {
           balance: number | null
           banned_at: string | null
           banned_reason: string | null
+          birthday: string | null
           created_at: string | null
           discord_id: string | null
           id: string
@@ -839,6 +1127,7 @@ export type Database = {
           referral_code: string | null
           referred_by: string | null
           steam_id: string | null
+          telegram_chat_id: number | null
           total_spent: number | null
           updated_at: string | null
           username: string | null
@@ -848,6 +1137,7 @@ export type Database = {
           balance?: number | null
           banned_at?: string | null
           banned_reason?: string | null
+          birthday?: string | null
           created_at?: string | null
           discord_id?: string | null
           id: string
@@ -856,6 +1146,7 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           steam_id?: string | null
+          telegram_chat_id?: number | null
           total_spent?: number | null
           updated_at?: string | null
           username?: string | null
@@ -865,6 +1156,7 @@ export type Database = {
           balance?: number | null
           banned_at?: string | null
           banned_reason?: string | null
+          birthday?: string | null
           created_at?: string | null
           discord_id?: string | null
           id?: string
@@ -873,6 +1165,7 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           steam_id?: string | null
+          telegram_chat_id?: number | null
           total_spent?: number | null
           updated_at?: string | null
           username?: string | null

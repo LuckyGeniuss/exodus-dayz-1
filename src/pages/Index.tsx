@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import VeteranBanner from "@/components/VeteranBanner";
 import ShopBanner from "@/components/ShopBanner";
+import HomeBannerCarousel from "@/components/HomeBannerCarousel";
+import FlashSaleBanner from "@/components/FlashSaleBanner";
 import ProductCard from "@/components/ProductCard";
 import ProductSkeleton from "@/components/ProductSkeleton";
 import SearchWithAutocomplete from "@/components/SearchWithAutocomplete";
@@ -17,6 +19,7 @@ import DailyRewardModal from "@/components/DailyRewardModal";
 import SEOHead from "@/components/SEOHead";
 import BundleShowcase from "@/components/BundleShowcase";
 import NewsFeed from "@/components/NewsFeed";
+import CompareFloatingPanel from "@/components/CompareFloatingPanel";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductsRatings } from "@/hooks/useProductsRatings";
@@ -288,6 +291,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead includeOrganization canonicalUrl="https://exodus-dayz.lovable.app/" />
+      <FlashSaleBanner />
       <ShopBanner />
       <Header 
         onCartOpen={() => setCartOpen(true)} 
@@ -302,6 +306,10 @@ const Index = () => {
         onRemove={removeFromCart}
         onCheckout={handleCheckout}
       />
+      
+      {/* Banner Carousel */}
+      <HomeBannerCarousel />
+      
       <Hero />
       <VeteranBanner />
       
@@ -421,6 +429,9 @@ const Index = () => {
       </section>
 
       <Footer />
+      
+      {/* Floating Compare Panel */}
+      <CompareFloatingPanel />
     </div>
   );
 };
