@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SteamAuthButton from '@/components/auth/SteamAuthButton';
+import GiftCard from '@/components/GiftCard';
 
 const Balance = () => {
   const { user, loading } = useAuth();
@@ -178,8 +179,9 @@ const Balance = () => {
         </div>
 
         <Tabs defaultValue="deposit" className="mb-8">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="deposit">Поповнити</TabsTrigger>
+            <TabsTrigger value="gift">Подарунок</TabsTrigger>
             <TabsTrigger value="history">Історія</TabsTrigger>
           </TabsList>
 
@@ -246,6 +248,10 @@ const Balance = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="gift">
+          <GiftCard />
         </TabsContent>
 
         <TabsContent value="history">

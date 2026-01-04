@@ -24,11 +24,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SteamIntegrationCard from '@/components/SteamIntegrationCard';
 import TelegramLinkCard from '@/components/TelegramLinkCard';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
+import ProfileSkeleton from '@/components/ProfileSkeleton';
 
 const Profile = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
@@ -48,6 +50,7 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     if (!user) return;
+    setProfileLoading(true);
     
     const { data, error } = await supabase
       .from('profiles')
@@ -59,6 +62,7 @@ const Profile = () => {
       setProfile(data);
       setUsername(data.username || '');
     }
+    setProfileLoading(false);
   };
 
   const handleUpdateProfile = async () => {
@@ -97,6 +101,9 @@ const Profile = () => {
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <h1 className="text-4xl font-military mb-8">Мій профіль</h1>
 
+        {profileLoading ? (
+          <ProfileSkeleton />
+        ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {/* Profile Info Card */}
           <Card>
@@ -285,6 +292,7 @@ const Profile = () => {
           {/* Balance History */}
           <BalanceHistory />
         </div>
+        )}
       </main>
       <Footer />
 

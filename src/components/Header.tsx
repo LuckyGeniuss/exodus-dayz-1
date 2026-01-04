@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, User, LogOut, Wallet, Package, Menu, Shield, Heart, Disc3, Headphones } from "lucide-react";
+import { ShoppingCart, User, LogOut, Wallet, Package, Shield, Heart, Disc3, Headphones } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -7,6 +7,8 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useWishlist } from "@/hooks/useWishlist";
 import NotificationCenter from "./NotificationCenter";
 import FortuneWheel from "./FortuneWheel";
+import MobileMenu from "./MobileMenu";
+import ThemeSwitcher from "./ThemeSwitcher";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,11 +16,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
 interface HeaderProps {
   onCartOpen?: () => void;
@@ -36,6 +33,9 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
+          {/* Mobile Menu */}
+          <MobileMenu onFortuneWheelOpen={() => setFortuneWheelOpen(true)} />
+          
           <Link to="/" className="flex items-center gap-2">
             <div className="text-2xl font-bold">
               <span className="text-primary">EXODUS</span>
@@ -56,9 +56,13 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
             <Link to="/contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Контакти
             </Link>
+            <Link to="/faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              FAQ
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeSwitcher />
             {user && <NotificationCenter />}
             
             {/* Fortune Wheel Button */}
