@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart, Image } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart, Image, Clock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -30,6 +30,7 @@ import InventoryManagement from '@/components/admin/InventoryManagement';
 import NewsManagement from '@/components/admin/NewsManagement';
 import ProductAnalytics from '@/components/admin/ProductAnalytics';
 import BannerManagement from '@/components/admin/BannerManagement';
+import CronJobsManagement from '@/components/admin/CronJobsManagement';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -153,6 +154,10 @@ const Admin = () => {
               <Mail className="h-4 w-4" />
               Email
             </TabsTrigger>
+            <TabsTrigger value="cron-jobs" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Cron
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Налаштування
@@ -257,6 +262,10 @@ const Admin = () => {
 
           <TabsContent value="settings">
             <SettingsManagement />
+          </TabsContent>
+
+          <TabsContent value="cron-jobs">
+            <CronJobsManagement />
           </TabsContent>
 
           <TabsContent value="api-keys">

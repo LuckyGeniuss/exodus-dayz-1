@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import SteamIntegrationCard from '@/components/SteamIntegrationCard';
 import TelegramLinkCard from '@/components/TelegramLinkCard';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
+import EmailNotificationSettings from '@/components/EmailNotificationSettings';
 import ProfileSkeleton from '@/components/ProfileSkeleton';
 import BirthdayCard from '@/components/BirthdayCard';
 
@@ -283,6 +284,9 @@ const Profile = () => {
 
           {/* Push Notifications */}
           <PushNotificationSettings />
+
+          {/* Email Notification Settings */}
+          <EmailNotificationSettings />
 
           {/* Birthday Card */}
           <BirthdayCard />

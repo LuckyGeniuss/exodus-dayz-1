@@ -382,6 +382,45 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_jobs: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          function_name: string
+          id: string
+          is_enabled: boolean | null
+          last_run_at: string | null
+          last_status: string | null
+          name: string
+          schedule: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          function_name: string
+          id?: string
+          is_enabled?: boolean | null
+          last_run_at?: string | null
+          last_status?: string | null
+          name: string
+          schedule: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          function_name?: string
+          id?: string
+          is_enabled?: boolean | null
+          last_run_at?: string | null
+          last_status?: string | null
+          name?: string
+          schedule?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       daily_rewards: {
         Row: {
           created_at: string
@@ -771,6 +810,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          details: Json | null
+          failed_count: number | null
+          id: string
+          recipients_count: number | null
+          sent_count: number | null
+          type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          details?: Json | null
+          failed_count?: number | null
+          id?: string
+          recipients_count?: number | null
+          sent_count?: number | null
+          type: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          details?: Json | null
+          failed_count?: number | null
+          id?: string
+          recipients_count?: number | null
+          sent_count?: number | null
+          type?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -1121,6 +1193,9 @@ export type Database = {
           birthday: string | null
           created_at: string | null
           discord_id: string | null
+          email_news_enabled: boolean | null
+          email_order_updates_enabled: boolean | null
+          email_promotions_enabled: boolean | null
           id: string
           is_banned: boolean | null
           is_veteran: boolean | null
@@ -1140,6 +1215,9 @@ export type Database = {
           birthday?: string | null
           created_at?: string | null
           discord_id?: string | null
+          email_news_enabled?: boolean | null
+          email_order_updates_enabled?: boolean | null
+          email_promotions_enabled?: boolean | null
           id: string
           is_banned?: boolean | null
           is_veteran?: boolean | null
@@ -1159,6 +1237,9 @@ export type Database = {
           birthday?: string | null
           created_at?: string | null
           discord_id?: string | null
+          email_news_enabled?: boolean | null
+          email_order_updates_enabled?: boolean | null
+          email_promotions_enabled?: boolean | null
           id?: string
           is_banned?: boolean | null
           is_veteran?: boolean | null
