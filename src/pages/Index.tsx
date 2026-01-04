@@ -6,7 +6,7 @@ import VeteranBanner from "@/components/VeteranBanner";
 import ShopBanner from "@/components/ShopBanner";
 import ProductCard from "@/components/ProductCard";
 import ProductSkeleton from "@/components/ProductSkeleton";
-import SearchBar from "@/components/SearchBar";
+import SearchWithAutocomplete from "@/components/SearchWithAutocomplete";
 import ProductFilters, { SortOption, Category } from "@/components/ProductFilters";
 import Pagination from "@/components/Pagination";
 import EmptyState from "@/components/EmptyState";
@@ -315,7 +315,7 @@ const Index = () => {
         </div>
         
         <div className="mb-8">
-          <SearchBar value={searchQuery} onChange={setSearchQuery} />
+          <SearchWithAutocomplete value={searchQuery} onChange={setSearchQuery} />
         </div>
 
         <div className="flex gap-8">
