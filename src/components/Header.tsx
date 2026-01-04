@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, User, LogOut, Wallet, Package, Menu, Shield, Heart, Disc3 } from "lucide-react";
+import { ShoppingCart, User, LogOut, Wallet, Package, Menu, Shield, Heart, Disc3, Headphones } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -137,6 +137,10 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
                   <DropdownMenuItem onClick={() => navigate('/wishlist')}>
                     <Heart className="mr-2 h-4 w-4" />
                     Збережені товари
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/support')}>
+                    <Headphones className="mr-2 h-4 w-4" />
+                    Підтримка
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut}>

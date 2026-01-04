@@ -82,12 +82,34 @@ const OrderManagementEnhanced = () => {
   };
 
   const updateStatusMutation = useMutation({
-    mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
+    mutationFn: async ({ orderId, status, userId }: { orderId: string; status: string; userId?: string }) => {
       const { error } = await supabase
         .from('orders')
         .update({ payment_status: status })
         .eq('id', orderId);
       if (error) throw error;
+
+      // Send Telegram notification to user
+      if (userId && (status === 'completed' || status === 'failed')) {
+        const action = status === 'completed' ? 'order_completed' : 'order_failed';
+        await supabase.functions.invoke('telegram-notify', {
+          body: { action, userId, orderId }
+        });
+
+        // Send push notification
+        await supabase.functions.invoke('send-push-notification', {
+          body: {
+            user_id: userId,
+            payload: {
+              title: status === 'completed' ? '✅ Замовлення оплачено!' : '❌ Помилка оплати',
+              body: status === 'completed' 
+                ? 'Дякуємо за покупку! Товари будуть видані найближчим часом.'
+                : 'Спробуйте оплатити знову або зверніться до підтримки.',
+              url: '/orders'
+            }
+          }
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-orders-enhanced'] });
@@ -311,7 +333,7 @@ const OrderManagementEnhanced = () => {
                 <TableCell>
                   <Select
                     value={order.payment_status || 'pending'}
-                    onValueChange={(status) => updateStatusMutation.mutate({ orderId: order.id, status })}
+                    onValueChange={(status) => updateStatusMutation.mutate({ orderId: order.id, status, userId: order.user_id })}
                   >
                     <SelectTrigger className="w-32">
                       <SelectValue />
