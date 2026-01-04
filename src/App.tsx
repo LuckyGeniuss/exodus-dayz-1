@@ -21,6 +21,7 @@ import Compare from "./pages/Compare";
 import Support from "./pages/Support";
 import FAQ from "./pages/FAQ";
 import { NewsListPage, NewsPostPage } from "./pages/News";
+import Bundles from "./pages/Bundles";
 import NotFound from "./pages/NotFound";
 import CompareFloatingPanel from "./components/CompareFloatingPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/news" element={<NewsListPage />} />
                 <Route path="/news/:id" element={<NewsPostPage />} />
+                <Route path="/bundles" element={<Bundles />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />
