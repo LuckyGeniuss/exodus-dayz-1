@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShoppingCart, User, LogOut, Wallet, Package, Shield, Heart, Disc3, Headphones } from "lucide-react";
+import { ShoppingCart, User, LogOut, Wallet, Package, Shield, Heart, Disc3, Headphones, Gift } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -50,6 +50,10 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
             <a href="/#shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Магазин
             </a>
+            <Link to="/bundles" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
+              <Gift className="h-4 w-4" />
+              Сборки
+            </Link>
             <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Про сервер
             </Link>

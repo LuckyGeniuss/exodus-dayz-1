@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Home, ShoppingBag, Info, Phone, User, LogOut, Wallet, Package, Heart, Headphones, Shield, Disc3 } from "lucide-react";
+import { Menu, X, Home, ShoppingBag, Info, Phone, User, LogOut, Wallet, Package, Heart, Headphones, Shield, Disc3, Gift } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Separator } from "./ui/separator";
@@ -61,6 +61,15 @@ const MobileMenu = ({ onFortuneWheelOpen }: MobileMenuProps) => {
           >
             <ShoppingBag className="h-5 w-5" />
             Магазин
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            className="justify-start gap-3 h-12 text-primary"
+            onClick={() => handleNavigate('/bundles')}
+          >
+            <Gift className="h-5 w-5" />
+            Сборки
           </Button>
           
           <Button 
