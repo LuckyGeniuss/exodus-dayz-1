@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Package, Eye, RefreshCcw, ChevronLeft, ChevronRight, CheckCircle2, Clock, XCircle, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import OrderExport from '@/components/OrderExport';
 import { format } from 'date-fns';
 import { uk } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -189,17 +190,20 @@ const Orders = () => {
             <Package className="h-8 w-8" />
             Мої замовлення
           </h1>
-          <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Фільтр" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Всі замовлення</SelectItem>
-              <SelectItem value="pending">В обробці</SelectItem>
-              <SelectItem value="completed">Завершені</SelectItem>
-              <SelectItem value="failed">Помилка</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <OrderExport orders={orders} />
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Фільтр" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всі замовлення</SelectItem>
+                <SelectItem value="pending">В обробці</SelectItem>
+                <SelectItem value="completed">Завершені</SelectItem>
+                <SelectItem value="failed">Помилка</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {filteredOrders.length === 0 ? (
