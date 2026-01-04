@@ -41,3 +41,9 @@ verify_jwt = true
 
 [functions.set-telegram-webhook]
 verify_jwt = true
+
+[functions.notify-ending-promotions]
+verify_jwt = false
+
+[functions.send-recommendations]
+verify_jwt = true
