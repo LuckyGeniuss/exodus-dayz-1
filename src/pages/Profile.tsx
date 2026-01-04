@@ -25,6 +25,7 @@ import SteamIntegrationCard from '@/components/SteamIntegrationCard';
 import TelegramLinkCard from '@/components/TelegramLinkCard';
 import PushNotificationSettings from '@/components/PushNotificationSettings';
 import ProfileSkeleton from '@/components/ProfileSkeleton';
+import BirthdayCard from '@/components/BirthdayCard';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -282,6 +283,9 @@ const Profile = () => {
 
           {/* Push Notifications */}
           <PushNotificationSettings />
+
+          {/* Birthday Card */}
+          <BirthdayCard />
 
           {/* Promo Code History */}
           <PromoCodeHistory />
