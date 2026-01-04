@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -25,6 +25,10 @@ import MonitoringDashboard from '@/components/admin/MonitoringDashboard';
 import UserCohortsAnalytics from '@/components/admin/UserCohortsAnalytics';
 import ABTestingManager from '@/components/admin/ABTestingManager';
 import EmailCampaignManager from '@/components/admin/EmailCampaignManager';
+import BundleManagement from '@/components/admin/BundleManagement';
+import InventoryManagement from '@/components/admin/InventoryManagement';
+import NewsManagement from '@/components/admin/NewsManagement';
+import ProductAnalytics from '@/components/admin/ProductAnalytics';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -64,9 +68,21 @@ const Admin = () => {
               <BarChart3 className="h-4 w-4" />
               Аналітика
             </TabsTrigger>
+            <TabsTrigger value="product-analytics" className="flex items-center gap-2">
+              <PieChart className="h-4 w-4" />
+              Товари (аналітика)
+            </TabsTrigger>
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Продукти
+            </TabsTrigger>
+            <TabsTrigger value="bundles" className="flex items-center gap-2">
+              <Gift className="h-4 w-4" />
+              Набори
+            </TabsTrigger>
+            <TabsTrigger value="inventory" className="flex items-center gap-2">
+              <Boxes className="h-4 w-4" />
+              Склад
             </TabsTrigger>
             <TabsTrigger value="orders" className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4" />
@@ -99,6 +115,10 @@ const Admin = () => {
             <TabsTrigger value="achievements" className="flex items-center gap-2">
               <Trophy className="h-4 w-4" />
               Досягнення
+            </TabsTrigger>
+            <TabsTrigger value="news" className="flex items-center gap-2">
+              <Newspaper className="h-4 w-4" />
+              Новини
             </TabsTrigger>
             <TabsTrigger value="support" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
@@ -146,8 +166,20 @@ const Admin = () => {
             <AnalyticsDashboard />
           </TabsContent>
 
+          <TabsContent value="product-analytics">
+            <ProductAnalytics />
+          </TabsContent>
+
           <TabsContent value="products">
             <ProductManagement />
+          </TabsContent>
+
+          <TabsContent value="bundles">
+            <BundleManagement />
+          </TabsContent>
+
+          <TabsContent value="inventory">
+            <InventoryManagement />
           </TabsContent>
 
           <TabsContent value="orders">
@@ -180,6 +212,10 @@ const Admin = () => {
 
           <TabsContent value="achievements">
             <AchievementManagement />
+          </TabsContent>
+
+          <TabsContent value="news">
+            <NewsManagement />
           </TabsContent>
 
           <TabsContent value="support">

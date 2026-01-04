@@ -188,6 +188,38 @@ export type Database = {
         }
         Relationships: []
       }
+      bundle_items: {
+        Row: {
+          bundle_id: string
+          created_at: string | null
+          id: string
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          bundle_id: string
+          created_at?: string | null
+          id?: string
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          bundle_id?: string
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "product_bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cart_items: {
         Row: {
           added_at: string | null
@@ -314,6 +346,36 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_logs: {
+        Row: {
+          admin_id: string | null
+          change_amount: number
+          created_at: string | null
+          id: string
+          order_id: string | null
+          product_id: string
+          reason: string
+        }
+        Insert: {
+          admin_id?: string | null
+          change_amount: number
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          product_id: string
+          reason: string
+        }
+        Update: {
+          admin_id?: string | null
+          change_amount?: number
+          created_at?: string | null
+          id?: string
+          order_id?: string | null
+          product_id?: string
+          reason?: string
+        }
+        Relationships: []
+      }
       loyalty_levels: {
         Row: {
           cashback_percent: number
@@ -374,6 +436,51 @@ export type Database = {
           subject?: string | null
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      news_posts: {
+        Row: {
+          author_id: string
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          image: string | null
+          is_pinned: boolean | null
+          is_published: boolean | null
+          published_at: string | null
+          summary: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          category?: string
+          content: string
+          created_at?: string | null
+          id?: string
+          image?: string | null
+          is_pinned?: boolean | null
+          is_published?: boolean | null
+          published_at?: string | null
+          summary?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          image?: string | null
+          is_pinned?: boolean | null
+          is_published?: boolean | null
+          published_at?: string | null
+          summary?: string | null
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -484,6 +591,126 @@ export type Database = {
         }
         Relationships: []
       }
+      price_alerts: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          notified_at: string | null
+          product_id: string
+          target_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notified_at?: string | null
+          product_id: string
+          target_price: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notified_at?: string | null
+          product_id?: string
+          target_price?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      price_history: {
+        Row: {
+          changed_at: string | null
+          changed_by: string | null
+          id: string
+          new_price: number
+          old_price: number
+          product_id: string
+        }
+        Insert: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_price: number
+          old_price: number
+          product_id: string
+        }
+        Update: {
+          changed_at?: string | null
+          changed_by?: string | null
+          id?: string
+          new_price?: number
+          old_price?: number
+          product_id?: string
+        }
+        Relationships: []
+      }
+      product_bundles: {
+        Row: {
+          bundle_price: number
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          image: string | null
+          is_active: boolean | null
+          name: string
+          start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bundle_price: number
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean | null
+          name: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bundle_price?: number
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean | null
+          name?: string
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      product_clicks: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          product_id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          product_id: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           created_at: string | null
@@ -508,6 +735,63 @@ export type Database = {
           image_url?: string
           is_primary?: boolean | null
           product_id?: string
+        }
+        Relationships: []
+      }
+      product_inventory: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_unlimited: boolean | null
+          low_stock_threshold: number | null
+          product_id: string
+          stock_quantity: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_unlimited?: boolean | null
+          low_stock_threshold?: number | null
+          product_id: string
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_unlimited?: boolean | null
+          low_stock_threshold?: number | null
+          product_id?: string
+          stock_quantity?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      product_views: {
+        Row: {
+          id: string
+          product_id: string
+          session_id: string | null
+          source: string | null
+          user_id: string | null
+          viewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          session_id?: string | null
+          source?: string | null
+          user_id?: string | null
+          viewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          session_id?: string | null
+          source?: string | null
+          user_id?: string | null
+          viewed_at?: string | null
         }
         Relationships: []
       }
