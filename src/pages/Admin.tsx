@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare } from 'lucide-react';
+import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
@@ -21,6 +21,10 @@ import AuditLogs from '@/components/admin/AuditLogs';
 import SuperAdminSettings from '@/components/admin/SuperAdminSettings';
 import BroadcastManagement from '@/components/admin/BroadcastManagement';
 import SupportTicketManagement from '@/components/admin/SupportTicketManagement';
+import MonitoringDashboard from '@/components/admin/MonitoringDashboard';
+import UserCohortsAnalytics from '@/components/admin/UserCohortsAnalytics';
+import ABTestingManager from '@/components/admin/ABTestingManager';
+import EmailCampaignManager from '@/components/admin/EmailCampaignManager';
 
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
@@ -108,6 +112,22 @@ const Admin = () => {
               <History className="h-4 w-4" />
               Аудит
             </TabsTrigger>
+            <TabsTrigger value="monitoring" className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              Моніторинг
+            </TabsTrigger>
+            <TabsTrigger value="cohorts" className="flex items-center gap-2">
+              <UsersRound className="h-4 w-4" />
+              Когорти
+            </TabsTrigger>
+            <TabsTrigger value="ab-tests" className="flex items-center gap-2">
+              <FlaskConical className="h-4 w-4" />
+              A/B Тести
+            </TabsTrigger>
+            <TabsTrigger value="email-campaigns" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Email
+            </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Налаштування
@@ -172,6 +192,22 @@ const Admin = () => {
 
           <TabsContent value="audit">
             <AuditLogs />
+          </TabsContent>
+
+          <TabsContent value="monitoring">
+            <MonitoringDashboard />
+          </TabsContent>
+
+          <TabsContent value="cohorts">
+            <UserCohortsAnalytics />
+          </TabsContent>
+
+          <TabsContent value="ab-tests">
+            <ABTestingManager />
+          </TabsContent>
+
+          <TabsContent value="email-campaigns">
+            <EmailCampaignManager />
           </TabsContent>
 
           <TabsContent value="settings">

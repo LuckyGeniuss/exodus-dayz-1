@@ -26,8 +26,9 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Find users with abandoned carts (items added more than 24 hours ago)
+    // Find users with abandoned carts (items added more than 24 hours ago, less than 7 days)
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     
     const { data: abandonedCarts, error: cartError } = await supabase
       .from('cart_items')
@@ -39,7 +40,8 @@ const handler = async (req: Request): Promise<Response> => {
         quantity,
         added_at
       `)
-      .lt('added_at', twentyFourHoursAgo);
+      .lt('added_at', twentyFourHoursAgo)
+      .gt('added_at', sevenDaysAgo);
 
     if (cartError) throw cartError;
 
