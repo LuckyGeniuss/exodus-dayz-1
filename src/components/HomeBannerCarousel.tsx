@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import BannerCountdownTimer from './BannerCountdownTimer';
 
 interface Banner {
   id: string;
@@ -18,6 +19,7 @@ interface Banner {
   badge_color: string | null;
   background_gradient: string | null;
   display_order: number;
+  end_date: string | null;
 }
 
 const HomeBannerCarousel = () => {
@@ -136,19 +138,24 @@ const HomeBannerCarousel = () => {
             <div className="relative z-20 h-full flex items-center">
               <div className="container mx-auto px-4 md:px-8">
                 <div className="max-w-2xl">
-                  {/* Badge */}
-                  {banner.badge_text && (
-                    <Badge
-                      variant={getBadgeVariant(banner.badge_color)}
-                      className={cn(
-                        "mb-4 text-lg px-4 py-1.5 font-bold animate-pulse",
-                        "shadow-lg",
-                        banner.badge_color === 'destructive' && "bg-red-600 hover:bg-red-700"
-                      )}
-                    >
-                      {banner.badge_text}
-                    </Badge>
-                  )}
+                  {/* Badge and Timer Row */}
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    {banner.badge_text && (
+                      <Badge
+                        variant={getBadgeVariant(banner.badge_color)}
+                        className={cn(
+                          "text-lg px-4 py-1.5 font-bold animate-pulse",
+                          "shadow-lg",
+                          banner.badge_color === 'destructive' && "bg-red-600 hover:bg-red-700"
+                        )}
+                      >
+                        {banner.badge_text}
+                      </Badge>
+                    )}
+                    {banner.end_date && (
+                      <BannerCountdownTimer endDate={banner.end_date} />
+                    )}
+                  </div>
                   
                   {/* Title with military font styling */}
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] tracking-wide">
