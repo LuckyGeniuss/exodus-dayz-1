@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/useAdmin';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Package, ShoppingCart, Users, Trophy, Tag, Settings, LayoutDashboard, BarChart3, TrendingUp, Zap, Shield, Ban, History, Lock, Send, MessageSquare, Activity, FlaskConical, Mail, UsersRound, Gift, Boxes, Newspaper, PieChart, Image, Clock, FolderOpen, LineChart } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminMobileNav from '@/components/admin/AdminMobileNav';
 import DashboardStatsEnhanced from '@/components/admin/DashboardStatsEnhanced';
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import ProductManagement from '@/components/admin/ProductManagement';
@@ -37,6 +38,7 @@ import EmailStatsDetails from '@/components/admin/EmailStatsDetails';
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -56,241 +58,80 @@ const Admin = () => {
     return null;
   }
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardStatsEnhanced />;
+      case 'analytics':
+        return <AnalyticsDashboard />;
+      case 'product-analytics':
+        return <ProductAnalytics />;
+      case 'products':
+        return <ProductManagement />;
+      case 'categories':
+        return <CategoryManagement />;
+      case 'bundles':
+        return <BundleManagement />;
+      case 'inventory':
+        return <InventoryManagement />;
+      case 'orders':
+        return <OrderManagementEnhanced />;
+      case 'users':
+        return <UserManagement />;
+      case 'roles':
+        return <RoleManagement />;
+      case 'bans':
+        return <UserBanManagement />;
+      case 'promo':
+        return <PromoCodeManagement />;
+      case 'flash-sales':
+        return <FlashSaleManagement />;
+      case 'loyalty':
+        return <LoyaltyManagement />;
+      case 'achievements':
+        return <AchievementManagement />;
+      case 'news':
+        return <NewsManagement />;
+      case 'banners':
+        return <BannerManagement />;
+      case 'support':
+        return <SupportTicketManagement />;
+      case 'broadcast':
+        return <BroadcastManagement />;
+      case 'audit':
+        return <AuditLogs />;
+      case 'monitoring':
+        return <MonitoringDashboard />;
+      case 'cohorts':
+        return <UserCohortsAnalytics />;
+      case 'ab-tests':
+        return <ABTestingManager />;
+      case 'email-campaigns':
+        return <EmailCampaignManager />;
+      case 'email-stats':
+        return <EmailStatsDetails />;
+      case 'cron-jobs':
+        return <CronJobsManagement />;
+      case 'settings':
+        return <SettingsManagement />;
+      case 'api-keys':
+        return <SuperAdminSettings />;
+      default:
+        return <DashboardStatsEnhanced />;
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-military mb-8">Адмін Панель</h1>
-
-        <Tabs defaultValue="dashboard" className="w-full">
-          <TabsList className="flex flex-wrap gap-1 h-auto mb-8">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Аналітика
-            </TabsTrigger>
-            <TabsTrigger value="product-analytics" className="flex items-center gap-2">
-              <PieChart className="h-4 w-4" />
-              Товари (аналітика)
-            </TabsTrigger>
-            <TabsTrigger value="products" className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              Продукти
-            </TabsTrigger>
-            <TabsTrigger value="categories" className="flex items-center gap-2">
-              <FolderOpen className="h-4 w-4" />
-              Категорії
-            </TabsTrigger>
-            <TabsTrigger value="bundles" className="flex items-center gap-2">
-              <Gift className="h-4 w-4" />
-              Набори
-            </TabsTrigger>
-            <TabsTrigger value="inventory" className="flex items-center gap-2">
-              <Boxes className="h-4 w-4" />
-              Склад
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Замовлення
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Користувачі
-            </TabsTrigger>
-            <TabsTrigger value="roles" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Ролі
-            </TabsTrigger>
-            <TabsTrigger value="bans" className="flex items-center gap-2">
-              <Ban className="h-4 w-4" />
-              Блокування
-            </TabsTrigger>
-            <TabsTrigger value="promo" className="flex items-center gap-2">
-              <Tag className="h-4 w-4" />
-              Промокоди
-            </TabsTrigger>
-            <TabsTrigger value="flash-sales" className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              Flash Sale
-            </TabsTrigger>
-            <TabsTrigger value="loyalty" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Лояльність
-            </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              Досягнення
-            </TabsTrigger>
-            <TabsTrigger value="news" className="flex items-center gap-2">
-              <Newspaper className="h-4 w-4" />
-              Новини
-            </TabsTrigger>
-            <TabsTrigger value="banners" className="flex items-center gap-2">
-              <Image className="h-4 w-4" />
-              Банери
-            </TabsTrigger>
-            <TabsTrigger value="support" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Підтримка
-            </TabsTrigger>
-            <TabsTrigger value="broadcast" className="flex items-center gap-2">
-              <Send className="h-4 w-4" />
-              Розсилки
-            </TabsTrigger>
-            <TabsTrigger value="audit" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Аудит
-            </TabsTrigger>
-            <TabsTrigger value="monitoring" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Моніторинг
-            </TabsTrigger>
-            <TabsTrigger value="cohorts" className="flex items-center gap-2">
-              <UsersRound className="h-4 w-4" />
-              Когорти
-            </TabsTrigger>
-            <TabsTrigger value="ab-tests" className="flex items-center gap-2">
-              <FlaskConical className="h-4 w-4" />
-              A/B Тести
-            </TabsTrigger>
-            <TabsTrigger value="email-campaigns" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Email
-            </TabsTrigger>
-            <TabsTrigger value="email-stats" className="flex items-center gap-2">
-              <LineChart className="h-4 w-4" />
-              Email Stats
-            </TabsTrigger>
-            <TabsTrigger value="cron-jobs" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Cron
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Налаштування
-            </TabsTrigger>
-            <TabsTrigger value="api-keys" className="flex items-center gap-2 text-amber-500">
-              <Lock className="h-4 w-4" />
-              API Ключі
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="dashboard">
-            <DashboardStatsEnhanced />
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <AnalyticsDashboard />
-          </TabsContent>
-
-          <TabsContent value="product-analytics">
-            <ProductAnalytics />
-          </TabsContent>
-
-          <TabsContent value="products">
-            <ProductManagement />
-          </TabsContent>
-
-          <TabsContent value="categories">
-            <CategoryManagement />
-          </TabsContent>
-
-          <TabsContent value="bundles">
-            <BundleManagement />
-          </TabsContent>
-
-          <TabsContent value="inventory">
-            <InventoryManagement />
-          </TabsContent>
-
-          <TabsContent value="orders">
-            <OrderManagementEnhanced />
-          </TabsContent>
-
-          <TabsContent value="users">
-            <UserManagement />
-          </TabsContent>
-
-          <TabsContent value="roles">
-            <RoleManagement />
-          </TabsContent>
-
-          <TabsContent value="bans">
-            <UserBanManagement />
-          </TabsContent>
-
-          <TabsContent value="promo">
-            <PromoCodeManagement />
-          </TabsContent>
-
-          <TabsContent value="flash-sales">
-            <FlashSaleManagement />
-          </TabsContent>
-
-          <TabsContent value="loyalty">
-            <LoyaltyManagement />
-          </TabsContent>
-
-          <TabsContent value="achievements">
-            <AchievementManagement />
-          </TabsContent>
-
-          <TabsContent value="news">
-            <NewsManagement />
-          </TabsContent>
-
-          <TabsContent value="banners">
-            <BannerManagement />
-          </TabsContent>
-
-          <TabsContent value="support">
-            <SupportTicketManagement />
-          </TabsContent>
-
-          <TabsContent value="broadcast">
-            <BroadcastManagement />
-          </TabsContent>
-
-          <TabsContent value="audit">
-            <AuditLogs />
-          </TabsContent>
-
-          <TabsContent value="monitoring">
-            <MonitoringDashboard />
-          </TabsContent>
-
-          <TabsContent value="cohorts">
-            <UserCohortsAnalytics />
-          </TabsContent>
-
-          <TabsContent value="ab-tests">
-            <ABTestingManager />
-          </TabsContent>
-
-          <TabsContent value="email-campaigns">
-            <EmailCampaignManager />
-          </TabsContent>
-
-          <TabsContent value="email-stats">
-            <EmailStatsDetails />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <SettingsManagement />
-          </TabsContent>
-
-          <TabsContent value="cron-jobs">
-            <CronJobsManagement />
-          </TabsContent>
-
-          <TabsContent value="api-keys">
-            <SuperAdminSettings />
-          </TabsContent>
-        </Tabs>
-      </main>
+      <div className="flex-1 flex">
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <main className="flex-1 p-6 overflow-auto">
+          <AdminMobileNav activeTab={activeTab} onTabChange={setActiveTab} />
+          <h1 className="text-3xl font-military mb-6 lg:mb-8">Адмін Панель</h1>
+          {renderContent()}
+        </main>
+      </div>
       <Footer />
     </div>
   );
