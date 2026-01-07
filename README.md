@@ -1,9 +1,14 @@
 <p align="center">
+  <img src="public/logo.svg" alt="Exodus DayZ Shop" width="400"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/actions/workflow/status/your-username/exodus-dayz-shop/ci.yml?branch=main&style=for-the-badge&label=CI" alt="CI"/>
   <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react" alt="React"/>
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript"/>
   <img src="https://img.shields.io/badge/Vite-5.4-646CFF?style=for-the-badge&logo=vite" alt="Vite"/>
   <img src="https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwindcss" alt="Tailwind"/>
-  <img src="https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase" alt="Supabase"/>
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License"/>
 </p>
 
 # 🎮 Exodus DayZ Shop
