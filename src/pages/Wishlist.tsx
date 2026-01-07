@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import EmptyState from '@/components/EmptyState';
+import ProductRecommendations from '@/components/ProductRecommendations';
 import { Button } from '@/components/ui/button';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { products } from '@/data/products';
@@ -157,6 +158,14 @@ const Wishlist = () => {
             ))}
           </div>
         )}
+
+        {/* Recommendations Section */}
+        <div className="mt-12">
+          <ProductRecommendations 
+            title="Вам також може сподобатись" 
+            limit={4}
+          />
+        </div>
       </main>
 
       <Footer />
