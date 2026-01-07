@@ -13,6 +13,8 @@
 - [Настройка базы данных](#настройка-базы-данных)
 - [Настройка API ключей](#настройка-api-ключей)
 - [Запуск проекта](#запуск-проекта)
+- [Docker](#docker)
+- [Тестирование](#тестирование)
 - [Деплой](#деплой)
 - [Решение проблем](#решение-проблем)
 
@@ -31,8 +33,13 @@
 
 ### Альтернативные пакетные менеджеры
 
-- **bun** — быстрая альтернатива npm
-- **pnpm** — эффективный менеджер пакетов
+```bash
+# bun (быстрее)
+bun install && bun run dev
+
+# pnpm (эффективнее)
+pnpm install && pnpm run dev
+```
 
 ---
 
@@ -52,13 +59,13 @@ npm install
 npm run dev
 ```
 
-Проект будет доступен по адресу: http://localhost:8080
+Проект будет доступен: http://localhost:8080
 
 ---
 
 ## Детальная установка
 
-### Шаг 1: Клонирование репозитория
+### Шаг 1: Клонирование
 
 ```bash
 git clone https://github.com/your-username/exodus-dayz-shop.git
@@ -67,114 +74,158 @@ cd exodus-dayz-shop
 
 ### Шаг 2: Установка зависимостей
 
-**npm:**
 ```bash
 npm install
 ```
 
-**bun (быстрее):**
-```bash
-bun install
-```
+<details>
+<summary>📦 Основные зависимости</summary>
 
-**pnpm:**
-```bash
-pnpm install
-```
+| Пакет | Версия | Назначение |
+|-------|--------|------------|
+| react | 18.3 | UI библиотека |
+| react-router-dom | 6.30 | Роутинг |
+| @tanstack/react-query | 5.83 | Управление состоянием |
+| @supabase/supabase-js | 2.58 | Supabase клиент |
+| tailwindcss | 3.4 | CSS фреймворк |
+| zod | 3.25 | Валидация |
+| react-hook-form | 7.61 | Формы |
+| recharts | 2.15 | Графики |
+| lucide-react | 0.462 | Иконки |
+
+</details>
 
 ### Шаг 3: Проверка установки
 
 ```bash
 # Проверить версии
-node --version  # должно быть 18+
-npm --version   # должно быть 9+
+node --version  # >= 18.0.0
+npm --version   # >= 9.0.0
 
 # Проверить зависимости
 npm list --depth=0
+
+# Проверить типы
+npx tsc --noEmit
 ```
 
 ---
 
 ## Настройка окружения
 
-### Файл .env
+### Переменные окружения
 
-Создайте файл `.env` в корне проекта:
+Файл `.env` создаётся автоматически при использовании Lovable Cloud:
 
 ```env
-# Supabase Configuration (обязательно)
+# Supabase (обязательно)
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIs...
 VITE_SUPABASE_PROJECT_ID=your-project-id
 
-# Site Configuration (опционально)
+# Опционально
 VITE_SITE_URL=https://your-domain.com
 VITE_SITE_NAME=Exodus DayZ Shop
 ```
-
-> **Примечание:** При использовании Lovable Cloud переменные окружения настраиваются автоматически.
 
 ### Описание переменных
 
 | Переменная | Описание | Обязательно |
 |------------|----------|-------------|
-| `VITE_SUPABASE_URL` | URL вашего Supabase проекта | ✅ |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Публичный ключ (anon key) | ✅ |
-| `VITE_SUPABASE_PROJECT_ID` | ID проекта | ✅ |
-| `VITE_SITE_URL` | URL сайта (для callback'ов) | ❌ |
-| `VITE_SITE_NAME` | Название сайта | ❌ |
+| `VITE_SUPABASE_URL` | URL Supabase проекта | ✅ |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Anon Key | ✅ |
+| `VITE_SUPABASE_PROJECT_ID` | Project ID | ✅ |
+| `VITE_SITE_URL` | URL сайта | ❌ |
+
+> **Примечание:** При использовании Lovable Cloud переменные настраиваются автоматически.
 
 ---
 
 ## Настройка базы данных
 
-### Автоматическая настройка (Lovable Cloud)
+### Автоматическая (Lovable Cloud)
 
-При использовании Lovable Cloud база данных создаётся и настраивается автоматически:
+При использовании Lovable Cloud:
+- ✅ Все таблицы создаются автоматически
+- ✅ RLS политики применяются
+- ✅ Edge Functions деплоятся
+- ✅ Миграции выполняются
 
-1. Все таблицы создаются через миграции
-2. RLS политики применяются автоматически
-3. Edge Functions деплоятся автоматически
+### Ручная (Self-hosted)
 
-### Ручная настройка (Self-hosted Supabase)
+```bash
+# Установить Supabase CLI
+npm install -g supabase
 
-1. **Создайте проект** на [supabase.com](https://supabase.com)
+# Войти
+supabase login
 
-2. **Выполните миграции:**
-   ```bash
-   # Установить Supabase CLI
-   npm install -g supabase
-   
-   # Войти в аккаунт
-   supabase login
-   
-   # Связать проект
-   supabase link --project-ref your-project-id
-   
-   # Выполнить миграции
-   supabase db push
-   ```
+# Связать проект
+supabase link --project-ref your-project-id
 
-3. **Задеплойте Edge Functions:**
-   ```bash
-   supabase functions deploy
-   ```
+# Выполнить миграции
+supabase db push
 
-### Структура базы данных
+# Задеплоить Edge Functions
+supabase functions deploy --all
+```
 
-База данных содержит 35+ таблиц. Основные:
+### Структура БД
 
-| Таблица | Описание |
-|---------|----------|
-| `profiles` | Профили пользователей |
-| `products` | Товары |
-| `orders` | Заказы |
-| `order_items` | Позиции заказов |
-| `cart_items` | Корзина |
-| `balance_transactions` | Транзакции баланса |
-| `promo_codes` | Промокоды |
-| `achievements` | Достижения |
-| `referrals` | Рефералы |
+База содержит **48 таблиц**:
+
+<details>
+<summary>Посмотреть все таблицы</summary>
+
+**Основные:**
+- `profiles` — Профили пользователей
+- `products` — Товары
+- `user_roles` — Роли пользователей
+- `loyalty_levels` — Уровни лояльности
+
+**Заказы:**
+- `orders` — Заказы
+- `order_items` — Позиции заказов
+- `cart_items` — Корзина
+
+**Платежи:**
+- `balance_transactions` — Транзакции
+- `promo_codes` — Промокоды
+- `promo_code_uses` — Использования промокодов
+
+**Геймификация:**
+- `achievements` — Достижения
+- `user_achievements` — Полученные достижения
+- `referrals` — Рефералы
+- `daily_rewards` — Ежедневные награды
+- `fortune_wheel_spins` — Спины колеса
+- `wishlist` — Избранное
+- `reviews` — Отзывы
+- `price_alerts` — Алерты цен
+
+**Коммуникации:**
+- `notifications` — Уведомления
+- `support_tickets` — Тикеты
+- `ticket_messages` — Сообщения
+- `broadcast_messages` — Рассылки
+- `news_posts` — Новости
+- `telegram_users` — Telegram привязки
+- `push_subscriptions` — Push подписки
+
+**Аналитика:**
+- `product_views` — Просмотры
+- `product_clicks` — Клики
+- `viewed_products` — История просмотров
+- `price_history` — История цен
+
+**Админ:**
+- `admin_settings` — Настройки
+- `admin_audit_logs` — Аудит логи
+- `cron_jobs` — Cron задачи
+- `ab_tests` — A/B тесты
+- `ab_test_results` — Результаты тестов
+
+</details>
 
 Полная схема: [DATABASE.md](./DATABASE.md)
 
@@ -182,51 +233,52 @@ VITE_SITE_NAME=Exodus DayZ Shop
 
 ## Настройка API ключей
 
-API ключи настраиваются в админ-панели: **Настройки → API Ключи**
+API ключи настраиваются в **Админ-панели → Настройки → API Ключи**
 
-### WayForPay (Карты)
+### Платёжные системы
 
-1. Зарегистрируйтесь на [wayforpay.com](https://wayforpay.com)
+#### WayForPay (Карты)
+
+1. Регистрация: [wayforpay.com](https://wayforpay.com)
 2. Создайте мерчанта
-3. Получите `MERCHANT_LOGIN` и `MERCHANT_SECRET`
-4. Добавьте в настройках:
+3. Получите ключи
+4. Добавьте:
    - `WAYFORPAY_MERCHANT_LOGIN`
    - `WAYFORPAY_MERCHANT_SECRET`
 
-### NOWPayments (Крипто)
+#### NOWPayments (Крипто)
 
-1. Зарегистрируйтесь на [nowpayments.io](https://nowpayments.io)
-2. Создайте API ключ
-3. Добавьте в настройках:
+1. Регистрация: [nowpayments.io](https://nowpayments.io)
+2. Создайте API Key
+3. Добавьте:
    - `NOWPAYMENTS_API_KEY`
+   - `NOWPAYMENTS_IPN_SECRET`
 
-### Resend (Email)
+### Интеграции
 
-1. Зарегистрируйтесь на [resend.com](https://resend.com)
-2. Верифицируйте домен
-3. Создайте API ключ
-4. Добавьте в настройках:
-   - `RESEND_API_KEY`
+#### Steam
 
-### Steam
+1. Получите ключ: [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey)
+2. Добавьте: `STEAM_API_KEY`
 
-1. Получите ключ на [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey)
-2. Добавьте в настройках:
-   - `STEAM_API_KEY`
-
-### Telegram
+#### Telegram
 
 1. Создайте бота через [@BotFather](https://t.me/BotFather)
 2. Получите токен
-3. Добавьте в настройках:
-   - `TELEGRAM_BOT_TOKEN`
+3. Добавьте: `TELEGRAM_BOT_TOKEN`
+4. Настройте webhook в админке
 
-### Discord
+#### Discord
 
-1. Создайте Webhook в настройках канала
-2. Скопируйте URL
-3. Добавьте в настройках:
-   - `DISCORD_WEBHOOK_URL`
+1. Создайте Webhook в канале Discord
+2. Добавьте: `DISCORD_WEBHOOK_URL`
+
+#### Email (Resend)
+
+1. Регистрация: [resend.com](https://resend.com)
+2. Верифицируйте домен
+3. Создайте API Key
+4. Добавьте: `RESEND_API_KEY`
 
 ---
 
@@ -238,15 +290,15 @@ API ключи настраиваются в админ-панели: **Наст
 npm run dev
 ```
 
-Сервер запустится на http://localhost:8080
+Сервер: http://localhost:8080
 
-### Production Build
+### Production
 
 ```bash
-# Собрать проект
+# Сборка
 npm run build
 
-# Предпросмотр сборки
+# Предпросмотр
 npm run preview
 ```
 
@@ -254,10 +306,100 @@ npm run preview
 
 | Команда | Описание |
 |---------|----------|
-| `npm run dev` | Запуск dev-сервера |
-| `npm run build` | Сборка для production |
+| `npm run dev` | Dev-сервер с HMR |
+| `npm run build` | Production сборка |
 | `npm run preview` | Предпросмотр сборки |
-| `npm run lint` | Проверка кода ESLint |
+| `npm run lint` | ESLint проверка |
+| `npm run test` | Запуск тестов |
+| `npm run test:coverage` | Тесты + coverage |
+
+---
+
+## Docker
+
+### Быстрый старт
+
+```bash
+# Собрать и запустить
+docker-compose up -d app
+
+# Просмотр логов
+docker-compose logs -f app
+
+# Остановить
+docker-compose down
+```
+
+### Development в Docker
+
+```bash
+docker-compose --profile dev up dev
+```
+
+### Команды Docker
+
+```bash
+# Rebuild
+docker-compose up -d --build
+
+# Очистка
+docker system prune -a
+
+# Проверка здоровья
+docker-compose ps
+```
+
+### Переменные окружения
+
+Создайте `.env` файл:
+
+```env
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJxxx...
+```
+
+---
+
+## Тестирование
+
+### Запуск тестов
+
+```bash
+# Все тесты
+npm run test
+
+# С coverage
+npm run test:coverage
+
+# Watch режим
+npm run test -- --watch
+
+# Конкретный файл
+npm run test -- src/lib/utils.test.ts
+```
+
+### Структура тестов
+
+```
+src/
+├── test/
+│   ├── setup.ts          # Настройка тестов
+│   └── test-utils.tsx    # Утилиты
+├── lib/
+│   └── utils.test.ts     # Unit тесты
+├── hooks/
+│   └── useCart.test.ts   # Тесты хуков
+└── components/
+    └── ui/
+        ├── button.test.tsx
+        └── badge.test.tsx
+```
+
+### Coverage
+
+После запуска `npm run test:coverage`:
+- HTML отчёт: `coverage/index.html`
+- Пороги: 50% statements/branches/functions/lines
 
 ---
 
@@ -266,97 +408,88 @@ npm run preview
 ### Lovable (Рекомендуется)
 
 1. Откройте проект в Lovable
-2. Нажмите **Share → Publish**
+2. **Share → Publish**
 3. Готово! 🎉
 
 ### Vercel
 
 ```bash
-# Установить Vercel CLI
 npm i -g vercel
-
-# Задеплоить
 vercel
 ```
 
 ### Netlify
 
-1. Подключите GitHub репозиторий
-2. Build command: `npm run build`
-3. Publish directory: `dist`
+- Build: `npm run build`
+- Publish: `dist`
 
 ### Docker
 
-```dockerfile
-# Dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-CMD ["npm", "run", "preview"]
-```
-
 ```bash
 docker build -t exodus-shop .
-docker run -p 8080:8080 exodus-shop
+docker run -p 80:80 exodus-shop
 ```
+
+Подробнее: [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ---
 
 ## Решение проблем
 
-### Ошибка "Module not found"
+### "Module not found"
 
 ```bash
-# Очистить кэш и переустановить
 rm -rf node_modules package-lock.json
 npm install
 ```
 
-### Ошибка подключения к Supabase
+### Ошибка Supabase
 
-1. Проверьте переменные в `.env`
-2. Убедитесь, что URL начинается с `https://`
-3. Проверьте, что ключ — это `anon` ключ, а не `service_role`
+1. Проверьте `.env`
+2. URL должен начинаться с `https://`
+3. Используйте `anon` ключ, не `service_role`
 
-### Порт 8080 занят
+### Порт занят
 
 ```bash
-# Использовать другой порт
 npm run dev -- --port 3000
 ```
 
-### Ошибки TypeScript
+### TypeScript ошибки
 
 ```bash
-# Проверить типы
 npx tsc --noEmit
-
-# Сгенерировать типы Supabase
-npx supabase gen types typescript --project-id your-project > src/integrations/supabase/types.ts
 ```
 
 ### Edge Functions не работают
 
-1. Проверьте, что функции задеплоены
-2. Проверьте логи в Supabase Dashboard
-3. Убедитесь, что все секреты настроены
+1. Проверьте деплой функций
+2. Проверьте логи в Cloud
+3. Проверьте секреты
+
+### Тесты падают
+
+```bash
+# Очистить кэш
+npm run test -- --clearCache
+
+# Переустановить
+rm -rf node_modules && npm install
+```
 
 ---
 
 ## Следующие шаги
 
-1. 📖 Изучите [FEATURES.md](./FEATURES.md) для понимания функционала
-2. 🗄️ Ознакомьтесь с [DATABASE.md](./DATABASE.md) для понимания схемы
-3. 🔧 Настройте API ключи в админ-панели
-4. 🎨 Кастомизируйте дизайн через `tailwind.config.ts`
+1. 📖 Изучите [FEATURES.md](./FEATURES.md)
+2. 🗄️ Ознакомьтесь с [DATABASE.md](./DATABASE.md)
+3. 🔌 Настройте API в [API.md](./API.md)
+4. 🚀 Задеплойте по [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ---
 
 ## Поддержка
 
 - 📚 [Документация](./README.md)
-- 🐛 [Сообщить о баге](https://github.com/your-username/exodus-dayz-shop/issues)
-- 💬 [Discord сообщество](https://discord.gg/your-server)
+- 🐛 [Issues](https://github.com/your-username/exodus-dayz-shop/issues)
+- 💬 [Discussions](https://github.com/your-username/exodus-dayz-shop/discussions)
