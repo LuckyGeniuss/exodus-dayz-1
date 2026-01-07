@@ -1,6 +1,6 @@
 # 🔌 API Reference
 
-Документация Edge Functions (Supabase Functions) проекта Exodus DayZ Shop.
+Документация Edge Functions проекта Exodus DayZ Shop.
 
 ---
 
@@ -11,61 +11,105 @@
 - [Платежные функции](#платежные-функции)
 - [Steam интеграция](#steam-интеграция)
 - [Telegram интеграция](#telegram-интеграция)
+- [Discord интеграция](#discord-интеграция)
 - [Email функции](#email-функции)
+- [Push уведомления](#push-уведомления)
 - [Утилиты](#утилиты)
+- [Обработка ошибок](#обработка-ошибок)
+- [Rate Limiting](#rate-limiting)
 
 ---
 
 ## Обзор
 
-| Функция | Описание | Аутентификация |
-|---------|----------|----------------|
-| `create-order` | Создание заказа | ✅ Требуется |
-| `wayforpay-payment` | Обработка платежа WayForPay | ❌ Webhook |
-| `nowpayments-payment` | Обработка платежа NOWPayments | ❌ Webhook |
-| `steam-auth` | Авторизация через Steam | ❌ Public |
-| `steam-profile` | Получение профиля Steam | ✅ Требуется |
-| `telegram-bot` | Webhook Telegram бота | ❌ Webhook |
-| `telegram-notify` | Отправка уведомления в Telegram | ✅ Требуется |
-| `discord-notify` | Отправка уведомления в Discord | ✅ Требуется |
-| `send-order-email` | Email о заказе | ✅ Требуется |
-| `send-status-email` | Email о статусе | ✅ Требуется |
-| `send-welcome-email` | Приветственный email | ✅ Требуется |
-| `send-promo-email` | Промо email | ✅ Admin |
-| `send-broadcast` | Массовая рассылка | ✅ Admin |
-| `send-cart-reminder` | Напоминание о корзине | ✅ Admin |
-| `send-recommendations` | Email с рекомендациями | ✅ Admin |
-| `send-push-notification` | Push уведомление | ✅ Требуется |
-| `notify-ending-promotions` | Уведомление об окончании акций | ✅ Admin |
-| `set-telegram-webhook` | Настройка webhook Telegram | ✅ Admin |
-| `seed-products` | Заполнение товаров | ✅ Admin |
+| Функция | Описание | Аутентификация | Метод |
+|---------|----------|----------------|-------|
+| `create-order` | Создание заказа | ✅ User | POST |
+| `wayforpay-payment` | Webhook WayForPay | 🔐 Signature | POST |
+| `nowpayments-payment` | Webhook NOWPayments | 🔐 IPN Secret | POST |
+| `steam-auth` | Авторизация Steam | ❌ Public | GET |
+| `steam-profile` | Профиль Steam | ✅ User | POST |
+| `telegram-bot` | Webhook Telegram | 🔐 Bot Token | POST |
+| `telegram-notify` | Уведомление Telegram | ✅ User | POST |
+| `set-telegram-webhook` | Настройка webhook | ✅ Admin | POST |
+| `discord-notify` | Уведомление Discord | ✅ User | POST |
+| `send-order-email` | Email о заказе | ✅ User | POST |
+| `send-status-email` | Email о статусе | ✅ User | POST |
+| `send-welcome-email` | Приветственный email | ✅ User | POST |
+| `send-promo-email` | Промо email | ✅ Admin | POST |
+| `send-broadcast` | Массовая рассылка | ✅ Admin | POST |
+| `send-cart-reminder` | Напоминание о корзине | ✅ Admin/Cron | POST |
+| `send-recommendations` | Рекомендации | ✅ Admin/Cron | POST |
+| `send-push-notification` | Push уведомление | ✅ User | POST |
+| `notify-ending-promotions` | Уведомления об акциях | ✅ Admin/Cron | POST |
+| `seed-products` | Заполнение товаров | ✅ Admin | POST |
+
+**Легенда:**
+- ✅ User — требуется JWT токен пользователя
+- ✅ Admin — требуется JWT токен с ролью admin/super_admin
+- 🔐 Signature — проверка подписи webhook
+- ❌ Public — без аутентификации
 
 ---
 
 ## Аутентификация
 
-### Headers
+### JWT Token
 
-Для функций, требующих аутентификации, передайте JWT токен:
+Для функций, требующих аутентификации, передайте JWT токен в заголовке:
 
 ```typescript
+import { supabase } from '@/integrations/supabase/client';
+
 const { data, error } = await supabase.functions.invoke('function-name', {
-  headers: {
-    Authorization: `Bearer ${session.access_token}`
-  },
   body: { ... }
+});
+// Токен передаётся автоматически через Supabase клиент
+```
+
+Или вручную:
+
+```typescript
+const response = await fetch('https://xxx.supabase.co/functions/v1/function-name', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${session.access_token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ ... })
 });
 ```
 
-### Роли
+### Роли пользователей
 
-| Роль | Описание |
-|------|----------|
-| `user` | Обычный пользователь |
-| `veteran` | Ветеран сервера |
-| `moderator` | Модератор |
-| `admin` | Администратор |
-| `super_admin` | Супер-админ |
+| Роль | Уровень | Доступные функции |
+|------|---------|-------------------|
+| `user` | 1 | Базовые операции (заказы, профиль) |
+| `veteran` | 2 | + Скидки ветерана |
+| `moderator` | 3 | + Просмотр тикетов |
+| `admin` | 4 | + Управление контентом, рассылки |
+| `super_admin` | 5 | Полный доступ ко всем функциям |
+
+### Проверка роли в Edge Function
+
+```typescript
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+);
+
+// Проверка роли
+const { data: hasRole } = await supabase.rpc('has_role', {
+  _user_id: userId,
+  _role: 'admin'
+});
+
+if (!hasRole) {
+  return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
+}
+```
 
 ---
 
@@ -73,47 +117,71 @@ const { data, error } = await supabase.functions.invoke('function-name', {
 
 ### create-order
 
-Создание нового заказа.
+Создание нового заказа с опциональной оплатой.
 
 **Endpoint:** `POST /functions/v1/create-order`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
+```typescript
+interface CreateOrderRequest {
+  items: Array<{
+    product_id: string;
+    quantity: number;
+    price: number;
+  }>;
+  steam_id: string;           // Steam ID для доставки (17 цифр)
+  payment_method: 'balance' | 'wayforpay' | 'nowpayments';
+  promo_code?: string;        // Опциональный промокод
+}
+```
+
+**Пример:**
 ```json
 {
   "items": [
-    {
-      "product_id": "vehicle-ada",
-      "quantity": 1,
-      "price": 150
-    }
+    { "product_id": "vehicle-ada", "quantity": 1, "price": 150 },
+    { "product_id": "build-nails", "quantity": 2, "price": 25 }
   ],
-  "steam_id": "76561198xxxxxxxxx",
+  "steam_id": "76561198123456789",
   "payment_method": "wayforpay",
   "promo_code": "DISCOUNT10"
 }
 ```
 
-**Response:**
+**Response (Success):**
+```typescript
+interface CreateOrderResponse {
+  success: true;
+  order_id: string;           // UUID заказа
+  payment_url?: string;       // URL для оплаты (wayforpay/nowpayments)
+  total_amount: number;       // Сумма до скидки
+  discount_amount: number;    // Размер скидки
+  final_amount: number;       // Итоговая сумма
+}
+```
+
+**Пример ответа:**
 ```json
 {
   "success": true,
-  "order_id": "uuid",
-  "payment_url": "https://secure.wayforpay.com/...",
-  "total_amount": 150,
-  "discount_amount": 15,
-  "final_amount": 135
+  "order_id": "550e8400-e29b-41d4-a716-446655440000",
+  "payment_url": "https://secure.wayforpay.com/pay?...",
+  "total_amount": 200,
+  "discount_amount": 20,
+  "final_amount": 180
 }
 ```
 
 **Ошибки:**
-| Код | Описание |
-|-----|----------|
-| 400 | Невалидные данные |
-| 401 | Не авторизован |
-| 402 | Недостаточно средств (для баланса) |
-| 404 | Товар не найден |
+| HTTP | Код | Описание |
+|------|-----|----------|
+| 400 | `INVALID_INPUT` | Невалидные данные |
+| 401 | `UNAUTHORIZED` | Не авторизован |
+| 402 | `INSUFFICIENT_BALANCE` | Недостаточно средств (для balance) |
+| 404 | `NOT_FOUND` | Товар не найден |
+| 422 | `PROMO_INVALID` | Промокод недействителен |
 
 ---
 
@@ -123,36 +191,47 @@ Webhook для обработки платежей WayForPay.
 
 **Endpoint:** `POST /functions/v1/wayforpay-payment`
 
-**Аутентификация:** Webhook signature
+**Аутентификация:** 🔐 Merchant Signature
+
+**Headers:**
+- `Content-Type: application/x-www-form-urlencoded` или `application/json`
 
 **Request (от WayForPay):**
-```json
-{
-  "merchantAccount": "exodus_shop",
-  "orderReference": "order_uuid",
-  "amount": 150,
-  "currency": "UAH",
-  "transactionStatus": "Approved",
-  "merchantSignature": "..."
+```typescript
+interface WayForPayCallback {
+  merchantAccount: string;
+  orderReference: string;     // UUID заказа
+  merchantSignature: string;  // HMAC-MD5 подпись
+  amount: number;
+  currency: string;           // UAH
+  authCode: string;
+  cardPan: string;
+  transactionStatus: 'Approved' | 'Declined' | 'Pending' | 'Refunded';
+  reasonCode?: number;
+  reason?: string;
+  createdDate: number;
+  processingDate: number;
+  fee: number;
 }
 ```
 
 **Response:**
 ```json
 {
-  "orderReference": "order_uuid",
+  "orderReference": "550e8400-e29b-41d4-a716-446655440000",
   "status": "accept",
   "time": 1704067200,
-  "signature": "..."
+  "signature": "a1b2c3d4e5f6..."
 }
 ```
 
-**Статусы:**
-| Статус | Действие |
-|--------|----------|
-| `Approved` | Заказ оплачен |
-| `Declined` | Заказ отменён |
-| `Refunded` | Возврат средств |
+**Обработка статусов:**
+| Статус | Действие в системе |
+|--------|-------------------|
+| `Approved` | Заказ помечается как `completed`, начисляется кэшбек |
+| `Declined` | Заказ помечается как `failed` |
+| `Pending` | Ожидание (без изменений) |
+| `Refunded` | Возврат средств на баланс |
 
 ---
 
@@ -162,17 +241,23 @@ Webhook для обработки криптоплатежей NOWPayments.
 
 **Endpoint:** `POST /functions/v1/nowpayments-payment`
 
-**Аутентификация:** IPN Secret
+**Аутентификация:** 🔐 IPN Secret (в заголовке `x-nowpayments-sig`)
 
 **Request (от NOWPayments):**
-```json
-{
-  "payment_id": 123456,
-  "order_id": "order_uuid",
-  "payment_status": "finished",
-  "pay_amount": 150,
-  "pay_currency": "usdttrc20",
-  "actually_paid": 150
+```typescript
+interface NOWPaymentsCallback {
+  payment_id: number;
+  payment_status: 'waiting' | 'confirming' | 'confirmed' | 'sending' | 'partially_paid' | 'finished' | 'failed' | 'refunded' | 'expired';
+  order_id: string;           // UUID заказа
+  order_description: string;
+  price_amount: number;
+  price_currency: string;
+  pay_amount: number;
+  pay_currency: string;       // btc, eth, usdt и др.
+  actually_paid: number;
+  actually_paid_at_fiat: number;
+  created_at: string;
+  updated_at: string;
 }
 ```
 
@@ -183,12 +268,14 @@ Webhook для обработки криптоплатежей NOWPayments.
 }
 ```
 
-**Статусы:**
+**Обработка статусов:**
 | Статус | Действие |
 |--------|----------|
 | `finished` | Заказ оплачен |
-| `failed` | Заказ отменён |
+| `confirmed` | Подтверждение в блокчейне |
+| `failed` | Ошибка оплаты |
 | `expired` | Время истекло |
+| `refunded` | Возврат |
 
 ---
 
@@ -196,49 +283,81 @@ Webhook для обработки криптоплатежей NOWPayments.
 
 ### steam-auth
 
-Инициация авторизации через Steam.
+Инициация авторизации через Steam OpenID.
 
 **Endpoint:** `GET /functions/v1/steam-auth`
 
-**Аутентификация:** Не требуется
+**Аутентификация:** ❌ Public
 
-**Query params:**
-| Параметр | Описание |
-|----------|----------|
-| `return_url` | URL для возврата |
-| `user_id` | ID пользователя для привязки |
+**Query параметры:**
+| Параметр | Тип | Описание |
+|----------|-----|----------|
+| `return_url` | string | URL для возврата после авторизации |
+| `user_id` | string | UUID пользователя для привязки Steam |
+
+**Пример:**
+```
+GET /functions/v1/steam-auth?return_url=https://shop.example.com/profile&user_id=550e8400-e29b-41d4-a716-446655440000
+```
 
 **Response:**
 ```json
 {
-  "redirect_url": "https://steamcommunity.com/openid/login?..."
+  "redirect_url": "https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&..."
 }
 ```
+
+**Callback обработка:**
+После успешной авторизации Steam редиректит на `return_url` с параметрами OpenID.
+Функция валидирует ответ и привязывает Steam ID к профилю пользователя.
 
 ---
 
 ### steam-profile
 
-Получение профиля Steam.
+Получение публичной информации профиля Steam.
 
 **Endpoint:** `POST /functions/v1/steam-profile`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
 ```json
 {
-  "steam_id": "76561198xxxxxxxxx"
+  "steam_id": "76561198123456789"
 }
 ```
 
 **Response:**
+```typescript
+interface SteamProfile {
+  steamid: string;
+  communityvisibilitystate: number;
+  profilestate: number;
+  personaname: string;        // Никнейм
+  profileurl: string;         // URL профиля
+  avatar: string;             // 32x32
+  avatarmedium: string;       // 64x64
+  avatarfull: string;         // 184x184
+  personastate: number;       // 0-6 (offline, online, busy, etc.)
+  realname?: string;
+  primaryclanid?: string;
+  timecreated?: number;
+  loccountrycode?: string;
+  locstatecode?: string;
+  loccityid?: number;
+}
+```
+
+**Пример ответа:**
 ```json
 {
-  "steamid": "76561198xxxxxxxxx",
-  "personaname": "PlayerName",
-  "avatarfull": "https://steamcdn-a.akamaihd.net/...",
-  "profileurl": "https://steamcommunity.com/id/..."
+  "steamid": "76561198123456789",
+  "personaname": "DayZPlayer",
+  "avatarfull": "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/xx/xxxxx_full.jpg",
+  "profileurl": "https://steamcommunity.com/id/dayzplayer/",
+  "personastate": 1,
+  "timecreated": 1234567890
 }
 ```
 
@@ -248,36 +367,77 @@ Webhook для обработки криптоплатежей NOWPayments.
 
 ### telegram-bot
 
-Webhook для Telegram бота.
+Webhook для обработки сообщений Telegram бота.
 
 **Endpoint:** `POST /functions/v1/telegram-bot`
 
-**Аутентификация:** Telegram webhook
+**Аутентификация:** 🔐 Telegram Webhook (проверка по IP и token)
 
 **Поддерживаемые команды:**
+
 | Команда | Описание |
 |---------|----------|
-| `/start` | Начало работы с ботом |
-| `/link <code>` | Привязка аккаунта |
+| `/start` | Начало работы с ботом, приветствие |
+| `/link <code>` | Привязка аккаунта магазина |
 | `/balance` | Проверка баланса |
-| `/orders` | Список заказов |
-| `/help` | Помощь |
+| `/orders` | Список последних заказов |
+| `/help` | Справка по командам |
+| `/unlink` | Отвязка аккаунта |
+
+**Request (от Telegram):**
+```typescript
+interface TelegramUpdate {
+  update_id: number;
+  message?: {
+    message_id: number;
+    from: {
+      id: number;
+      is_bot: boolean;
+      first_name: string;
+      username?: string;
+    };
+    chat: {
+      id: number;
+      type: string;
+    };
+    date: number;
+    text?: string;
+  };
+}
+```
+
+**Response:**
+```json
+{
+  "ok": true
+}
+```
 
 ---
 
 ### telegram-notify
 
-Отправка уведомления в Telegram.
+Отправка уведомления пользователю в Telegram.
 
 **Endpoint:** `POST /functions/v1/telegram-notify`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
+```typescript
+interface TelegramNotifyRequest {
+  user_id: string;    // UUID пользователя
+  message: string;    // Текст сообщения (поддерживает Markdown)
+  parse_mode?: 'Markdown' | 'HTML';
+}
+```
+
+**Пример:**
 ```json
 {
-  "user_id": "uuid",
-  "message": "Ваш заказ #123 оплачен!"
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "🎉 *Ваш заказ #123 оплачен!*\n\nТовары скоро будут доставлены на ваш Steam аккаунт.",
+  "parse_mode": "Markdown"
 }
 ```
 
@@ -285,26 +445,93 @@ Webhook для Telegram бота.
 ```json
 {
   "success": true,
-  "telegram_id": 123456789
+  "telegram_id": 123456789,
+  "message_id": 456
 }
 ```
+
+**Ошибки:**
+| HTTP | Код | Описание |
+|------|-----|----------|
+| 404 | `TELEGRAM_NOT_LINKED` | Telegram не привязан |
+| 400 | `TELEGRAM_BLOCKED` | Пользователь заблокировал бота |
 
 ---
 
 ### set-telegram-webhook
 
-Настройка webhook для Telegram бота.
+Настройка webhook URL для Telegram бота.
 
 **Endpoint:** `POST /functions/v1/set-telegram-webhook`
 
-**Аутентификация:** Admin
+**Аутентификация:** ✅ Admin
+
+**Request:** Без тела (настройки берутся из переменных окружения)
 
 **Response:**
 ```json
 {
   "success": true,
-  "webhook_url": "https://xxx.supabase.co/functions/v1/telegram-bot",
-  "webhook_info": { ... }
+  "webhook_url": "https://eababvkyjfkhqmjkcxiy.supabase.co/functions/v1/telegram-bot",
+  "webhook_info": {
+    "url": "https://...",
+    "has_custom_certificate": false,
+    "pending_update_count": 0,
+    "max_connections": 40
+  }
+}
+```
+
+---
+
+## Discord интеграция
+
+### discord-notify
+
+Отправка уведомления в Discord канал (через webhook).
+
+**Endpoint:** `POST /functions/v1/discord-notify`
+
+**Аутентификация:** ✅ User
+
+**Request:**
+```typescript
+interface DiscordNotifyRequest {
+  order_id: string;       // UUID заказа
+  type?: 'order' | 'payment' | 'refund';
+}
+```
+
+**Пример:**
+```json
+{
+  "order_id": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "order"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message_id": "1234567890"
+}
+```
+
+**Discord Embed пример:**
+```json
+{
+  "embeds": [{
+    "title": "🛒 Новый заказ #ABC123",
+    "color": 5763719,
+    "fields": [
+      { "name": "Покупатель", "value": "DayZPlayer", "inline": true },
+      { "name": "Steam ID", "value": "76561198...", "inline": true },
+      { "name": "Сумма", "value": "150₴", "inline": true },
+      { "name": "Товары", "value": "• ADA 4x4 (1)\n• Nails (2)" }
+    ],
+    "timestamp": "2024-01-15T12:00:00Z"
+  }]
 }
 ```
 
@@ -314,22 +541,48 @@ Webhook для Telegram бота.
 
 ### send-order-email
 
-Отправка email о заказе.
+Отправка email подтверждения заказа.
 
 **Endpoint:** `POST /functions/v1/send-order-email`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
+```typescript
+interface OrderEmailRequest {
+  email: string;
+  order_id: string;
+  order_number: string;
+  items: Array<{
+    name: string;
+    price: number;
+    quantity: number;
+  }>;
+  total: number;
+  discount?: number;
+  steam_id: string;
+}
+```
+
+**Пример:**
 ```json
 {
   "email": "user@example.com",
-  "order_id": "uuid",
-  "order_number": "123",
+  "order_id": "550e8400-e29b-41d4-a716-446655440000",
+  "order_number": "ABC123",
   "items": [
     { "name": "ADA 4x4", "price": 150, "quantity": 1 }
   ],
-  "total": 150
+  "total": 150,
+  "steam_id": "76561198123456789"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message_id": "msg_xxx"
 }
 ```
 
@@ -341,15 +594,27 @@ Email об изменении статуса заказа.
 
 **Endpoint:** `POST /functions/v1/send-status-email`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
+```typescript
+interface StatusEmailRequest {
+  email: string;
+  order_id: string;
+  order_number: string;
+  status: 'pending' | 'completed' | 'cancelled' | 'refunded' | 'delivered';
+  status_message?: string;
+}
+```
+
+**Пример:**
 ```json
 {
   "email": "user@example.com",
-  "order_id": "uuid",
-  "status": "paid",
-  "order_number": "123"
+  "order_id": "550e8400-e29b-41d4-a716-446655440000",
+  "order_number": "ABC123",
+  "status": "delivered",
+  "status_message": "Товары успешно доставлены на ваш Steam аккаунт!"
 }
 ```
 
@@ -357,17 +622,17 @@ Email об изменении статуса заказа.
 
 ### send-welcome-email
 
-Приветственный email.
+Приветственный email для новых пользователей.
 
 **Endpoint:** `POST /functions/v1/send-welcome-email`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
 ```json
 {
   "email": "user@example.com",
-  "username": "PlayerName"
+  "username": "DayZPlayer"
 }
 ```
 
@@ -375,19 +640,38 @@ Email об изменении статуса заказа.
 
 ### send-promo-email
 
-Промо-рассылка.
+Промо-рассылка для email кампании.
 
 **Endpoint:** `POST /functions/v1/send-promo-email`
 
-**Аутентификация:** Admin
+**Аутентификация:** ✅ Admin
 
 **Request:**
+```typescript
+interface PromoEmailRequest {
+  campaign_id: string;        // UUID кампании
+  subject: string;
+  body: string;               // HTML контент
+  target_audience: 'all' | 'active' | 'inactive' | 'veterans';
+}
+```
+
+**Пример:**
 ```json
 {
-  "campaign_id": "uuid",
-  "subject": "Скидки до 50%!",
+  "campaign_id": "550e8400-e29b-41d4-a716-446655440000",
+  "subject": "🔥 Скидки до 50% на все транспортные средства!",
   "body": "<html>...</html>",
   "target_audience": "all"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "sent_count": 150,
+  "failed_count": 2
 }
 ```
 
@@ -399,12 +683,25 @@ Email об изменении статуса заказа.
 
 **Endpoint:** `POST /functions/v1/send-broadcast`
 
-**Аутентификация:** Admin
+**Аутентификация:** ✅ Admin
 
 **Request:**
 ```json
 {
-  "broadcast_id": "uuid"
+  "broadcast_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+Broadcast берётся из таблицы `broadcast_messages` по ID.
+
+**Response:**
+```json
+{
+  "success": true,
+  "email_sent": 120,
+  "push_sent": 85,
+  "notifications_created": 150,
+  "failed": 5
 }
 ```
 
@@ -416,14 +713,20 @@ Email об изменении статуса заказа.
 
 **Endpoint:** `POST /functions/v1/send-cart-reminder`
 
-**Аутентификация:** Admin (Cron)
+**Аутентификация:** ✅ Admin (Cron)
+
+**Логика:**
+- Находит пользователей с корзиной, обновлённой >24 часов назад
+- Отправляет email напоминание
+- Создаёт in-app уведомление
 
 **Response:**
 ```json
 {
   "success": true,
-  "sent_count": 15,
-  "failed_count": 0
+  "users_notified": 15,
+  "emails_sent": 12,
+  "failed": 0
 }
 ```
 
@@ -431,11 +734,24 @@ Email об изменении статуса заказа.
 
 ### send-recommendations
 
-Email с персональными рекомендациями.
+Email с персональными рекомендациями товаров.
 
 **Endpoint:** `POST /functions/v1/send-recommendations`
 
-**Аутентификация:** Admin (Cron)
+**Аутентификация:** ✅ Admin (Cron)
+
+**Логика:**
+- Анализирует историю покупок и просмотров
+- Генерирует персональные рекомендации
+- Отправляет email активным пользователям
+
+**Response:**
+```json
+{
+  "success": true,
+  "sent_count": 50
+}
+```
 
 ---
 
@@ -445,24 +761,68 @@ Email с персональными рекомендациями.
 
 **Endpoint:** `POST /functions/v1/notify-ending-promotions`
 
-**Аутентификация:** Admin (Cron)
+**Аутентификация:** ✅ Admin (Cron)
+
+**Логика:**
+- Находит акции, заканчивающиеся в ближайшие 24 часа
+- Уведомляет пользователей с товарами в wishlist
+
+**Response:**
+```json
+{
+  "success": true,
+  "promotions_ending": 3,
+  "users_notified": 25
+}
+```
 
 ---
 
-## Discord интеграция
+## Push уведомления
 
-### discord-notify
+### send-push-notification
 
-Отправка уведомления в Discord канал.
+Отправка Web Push уведомления.
 
-**Endpoint:** `POST /functions/v1/discord-notify`
+**Endpoint:** `POST /functions/v1/send-push-notification`
 
-**Аутентификация:** Требуется
+**Аутентификация:** ✅ User
 
 **Request:**
+```typescript
+interface PushNotificationRequest {
+  user_id: string;
+  payload: {
+    title: string;
+    body: string;
+    icon?: string;
+    badge?: string;
+    url?: string;           // URL для клика
+    tag?: string;           // Группировка уведомлений
+    data?: object;          // Дополнительные данные
+  };
+}
+```
+
+**Пример:**
 ```json
 {
-  "order_id": "uuid"
+  "user_id": "550e8400-e29b-41d4-a716-446655440000",
+  "payload": {
+    "title": "🛒 Новый заказ!",
+    "body": "Заказ #ABC123 успешно создан",
+    "icon": "/icons/cart.png",
+    "url": "/orders/550e8400-e29b-41d4-a716-446655440000",
+    "tag": "order"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "sent_to_endpoints": 2
 }
 ```
 
@@ -470,65 +830,22 @@ Email с персональными рекомендациями.
 
 ## Утилиты
 
-### send-push-notification
-
-Отправка Push уведомления.
-
-**Endpoint:** `POST /functions/v1/send-push-notification`
-
-**Аутентификация:** Требуется
-
-**Request:**
-```json
-{
-  "user_id": "uuid",
-  "payload": {
-    "title": "Новый заказ",
-    "body": "Заказ #123 успешно создан",
-    "url": "/orders/uuid",
-    "icon": "/icons/order.png"
-  }
-}
-```
-
----
-
 ### seed-products
 
 Заполнение базы тестовыми товарами.
 
 **Endpoint:** `POST /functions/v1/seed-products`
 
-**Аутентификация:** Admin
+**Аутентификация:** ✅ Admin
+
+**⚠️ Внимание:** Эта функция перезаписывает существующие товары!
 
 **Response:**
 ```json
 {
   "success": true,
-  "count": 20
-}
-```
-
----
-
-## Использование с Supabase Client
-
-```typescript
-import { supabase } from '@/integrations/supabase/client';
-
-// Вызов функции с авторизацией
-const { data, error } = await supabase.functions.invoke('create-order', {
-  body: {
-    items: [{ product_id: 'vehicle-ada', quantity: 1, price: 150 }],
-    steam_id: '76561198xxx',
-    payment_method: 'balance'
-  }
-});
-
-if (error) {
-  console.error('Error:', error.message);
-} else {
-  console.log('Order created:', data);
+  "products_created": 20,
+  "categories": ["vehicles", "containers", "building", "parts", "vip"]
 }
 ```
 
@@ -536,46 +853,225 @@ if (error) {
 
 ## Обработка ошибок
 
-Все функции возвращают ошибки в формате:
+### Формат ошибок
 
+Все функции возвращают ошибки в едином формате:
+
+```typescript
+interface ErrorResponse {
+  error: string;          // Человекочитаемое сообщение
+  code: string;           // Код ошибки для обработки
+  details?: object;       // Дополнительные данные
+}
+```
+
+**Пример:**
 ```json
 {
-  "error": "Error message",
-  "code": "ERROR_CODE"
+  "error": "Недостаточно средств на балансе",
+  "code": "INSUFFICIENT_BALANCE",
+  "details": {
+    "required": 150,
+    "available": 100
+  }
 }
 ```
 
 ### Коды ошибок
 
-| Код | Описание |
-|-----|----------|
-| `UNAUTHORIZED` | Требуется авторизация |
-| `FORBIDDEN` | Недостаточно прав |
-| `NOT_FOUND` | Ресурс не найден |
-| `INVALID_INPUT` | Невалидные данные |
-| `INSUFFICIENT_BALANCE` | Недостаточно средств |
-| `PAYMENT_FAILED` | Ошибка платежа |
-| `RATE_LIMITED` | Превышен лимит запросов |
-| `INTERNAL_ERROR` | Внутренняя ошибка |
+| Код | HTTP | Описание |
+|-----|------|----------|
+| `UNAUTHORIZED` | 401 | Требуется авторизация |
+| `FORBIDDEN` | 403 | Недостаточно прав |
+| `NOT_FOUND` | 404 | Ресурс не найден |
+| `INVALID_INPUT` | 400 | Невалидные входные данные |
+| `VALIDATION_ERROR` | 422 | Ошибка валидации |
+| `INSUFFICIENT_BALANCE` | 402 | Недостаточно средств |
+| `PAYMENT_FAILED` | 402 | Ошибка платежа |
+| `RATE_LIMITED` | 429 | Превышен лимит запросов |
+| `PROMO_INVALID` | 422 | Промокод недействителен |
+| `PROMO_EXPIRED` | 422 | Промокод истёк |
+| `STEAM_NOT_LINKED` | 400 | Steam не привязан |
+| `TELEGRAM_NOT_LINKED` | 400 | Telegram не привязан |
+| `INTERNAL_ERROR` | 500 | Внутренняя ошибка сервера |
+
+### Обработка на клиенте
+
+```typescript
+import { supabase } from '@/integrations/supabase/client';
+
+const createOrder = async (orderData: OrderRequest) => {
+  const { data, error } = await supabase.functions.invoke('create-order', {
+    body: orderData
+  });
+  
+  if (error) {
+    // Ошибка сети или сервера
+    throw new Error('Network error');
+  }
+  
+  if (!data.success) {
+    // Бизнес-ошибка
+    switch (data.code) {
+      case 'INSUFFICIENT_BALANCE':
+        toast.error('Недостаточно средств на балансе');
+        break;
+      case 'PROMO_INVALID':
+        toast.error('Промокод недействителен');
+        break;
+      default:
+        toast.error(data.error || 'Ошибка создания заказа');
+    }
+    return null;
+  }
+  
+  return data;
+};
+```
 
 ---
 
 ## Rate Limiting
 
-Все функции защищены rate limiting:
+### Лимиты
 
-| Эндпоинт | Лимит |
-|----------|-------|
-| Публичные | 100 req/min |
-| Аутентифицированные | 300 req/min |
-| Admin | 1000 req/min |
+Все функции защищены rate limiting на уровне базы данных:
 
-При превышении лимита возвращается:
+| Категория | Лимит | Окно |
+|-----------|-------|------|
+| Публичные | 100 запросов | 1 минута |
+| Аутентифицированные | 300 запросов | 1 минута |
+| Платежные | 10 запросов | 1 минута |
+| Admin | 1000 запросов | 1 минута |
+
+### Ответ при превышении
 
 ```json
 {
   "error": "Too many requests",
   "code": "RATE_LIMITED",
-  "retry_after": 60
+  "retry_after": 45
 }
 ```
+
+HTTP статус: `429 Too Many Requests`
+
+Заголовки:
+```
+Retry-After: 45
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1704067200
+```
+
+### Реализация rate limit
+
+```typescript
+// В Edge Function
+const { data: allowed } = await supabase.rpc('check_rate_limit', {
+  _user_id: userId,
+  _ip_address: request.headers.get('x-forwarded-for') || 'unknown',
+  _endpoint: 'create-order',
+  _max_requests: 10,
+  _window_minutes: 1
+});
+
+if (!allowed) {
+  return new Response(
+    JSON.stringify({ error: 'Too many requests', code: 'RATE_LIMITED' }),
+    { status: 429, headers: { 'Retry-After': '60' } }
+  );
+}
+```
+
+---
+
+## CORS
+
+Все Edge Functions настроены для работы с CORS:
+
+```typescript
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Обработка preflight
+if (req.method === 'OPTIONS') {
+  return new Response(null, { headers: corsHeaders });
+}
+```
+
+---
+
+## Примеры использования
+
+### Создание заказа с оплатой через баланс
+
+```typescript
+const { data, error } = await supabase.functions.invoke('create-order', {
+  body: {
+    items: [
+      { product_id: 'vehicle-ada', quantity: 1, price: 150 }
+    ],
+    steam_id: profile.steam_id,
+    payment_method: 'balance'
+  }
+});
+
+if (data?.success) {
+  toast.success('Заказ оформлен!');
+  router.push(`/orders/${data.order_id}`);
+}
+```
+
+### Привязка Steam аккаунта
+
+```typescript
+// Получение URL для авторизации
+const { data } = await supabase.functions.invoke('steam-auth', {
+  method: 'GET',
+  body: {
+    return_url: window.location.origin + '/profile',
+    user_id: user.id
+  }
+});
+
+// Редирект на Steam
+window.location.href = data.redirect_url;
+```
+
+### Отправка уведомления в Telegram
+
+```typescript
+await supabase.functions.invoke('telegram-notify', {
+  body: {
+    user_id: order.user_id,
+    message: `✅ *Заказ #${order.id.slice(0, 8)} доставлен!*\n\nТовары отправлены на Steam ID: \`${order.steam_id}\``,
+    parse_mode: 'Markdown'
+  }
+});
+```
+
+---
+
+## Переменные окружения
+
+Edge Functions используют следующие секреты:
+
+| Переменная | Описание |
+|------------|----------|
+| `SUPABASE_URL` | URL проекта Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service Role ключ |
+| `WAYFORPAY_MERCHANT_ACCOUNT` | Аккаунт WayForPay |
+| `WAYFORPAY_SECRET_KEY` | Секретный ключ WayForPay |
+| `NOWPAYMENTS_API_KEY` | API ключ NOWPayments |
+| `NOWPAYMENTS_IPN_SECRET` | IPN секрет NOWPayments |
+| `RESEND_API_KEY` | API ключ Resend (email) |
+| `TELEGRAM_BOT_TOKEN` | Токен Telegram бота |
+| `DISCORD_WEBHOOK_URL` | URL Discord webhook |
+| `STEAM_API_KEY` | Ключ Steam Web API |
+
+---
+
+*Документация обновлена: Январь 2026*
