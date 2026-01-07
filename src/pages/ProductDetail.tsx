@@ -21,6 +21,8 @@ import ReviewForm from "@/components/ReviewForm";
 import RecentlyViewedProducts from "@/components/RecentlyViewedProducts";
 import PriceAlertCard from "@/components/PriceAlertCard";
 import ProductRecommendations from "@/components/ProductRecommendations";
+import PriceHistoryChart from "@/components/PriceHistoryChart";
+import StockBadge from "@/components/StockBadge";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -131,7 +133,7 @@ const ProductDetail = () => {
           {/* Product Info */}
           <div className="space-y-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <div>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <Badge>{product.category}</Badge>
                 {promotion && (
                   <Badge className="bg-destructive text-destructive-foreground">
@@ -139,6 +141,7 @@ const ProductDetail = () => {
                     -{promotion.discount_percent}%
                   </Badge>
                 )}
+                <StockBadge />
               </div>
               <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
               <p className="text-muted-foreground text-lg leading-relaxed mb-6">
@@ -228,6 +231,13 @@ const ProductDetail = () => {
             />
           </div>
         </div>
+
+        {/* Price History Chart */}
+        <PriceHistoryChart 
+          productId={product.id}
+          currentPrice={finalPrice || product.price}
+          productName={product.name}
+        />
 
         {/* Recently Viewed Products */}
         <div className="mt-16">
