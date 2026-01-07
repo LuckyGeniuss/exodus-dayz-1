@@ -20,6 +20,7 @@ import SEOHead from "@/components/SEOHead";
 import BundleShowcase from "@/components/BundleShowcase";
 import NewsFeed from "@/components/NewsFeed";
 import CompareFloatingPanel from "@/components/CompareFloatingPanel";
+import ProductRecommendations from "@/components/ProductRecommendations";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useProducts } from "@/hooks/useProducts";
 import { useProductsRatings } from "@/hooks/useProductsRatings";
@@ -405,6 +406,14 @@ const Index = () => {
 
       {/* News Section */}
       <NewsFeed limit={3} />
+
+      {/* Recommendations Section */}
+      <section className="container mx-auto px-4 py-12">
+        <ProductRecommendations 
+          title="Рекомендовано для вас" 
+          limit={6}
+        />
+      </section>
 
       <section id="about" className="bg-card border-y border-border py-20">
         <div className="container mx-auto px-4">
