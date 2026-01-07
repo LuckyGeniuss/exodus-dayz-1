@@ -48,6 +48,7 @@ const menuSections: MenuSection[] = [
       { id: "products", label: "Продукти", icon: Package },
       { id: "categories", label: "Категорії", icon: FolderOpen },
       { id: "bundles", label: "Набори", icon: Gift },
+      { id: "bundle-analytics", label: "Аналітика наборів", icon: LineChart },
       { id: "inventory", label: "Склад", icon: Boxes },
       { id: "product-analytics", label: "Аналітика товарів", icon: PieChart },
     ],
@@ -88,6 +89,7 @@ const menuSections: MenuSection[] = [
     items: [
       { id: "support", label: "Підтримка", icon: MessageSquare },
       { id: "broadcast", label: "Розсилки", icon: Send },
+      { id: "promo-email", label: "Промо-розсилка", icon: Mail, highlight: true },
       { id: "email-campaigns", label: "Email кампанії", icon: Mail },
       { id: "email-stats", label: "Email статистика", icon: LineChart },
     ],
