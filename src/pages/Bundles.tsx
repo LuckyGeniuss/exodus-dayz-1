@@ -30,7 +30,7 @@ const Bundles = () => {
         addItem(product, item.quantity);
       }
     }
-    toast.success(`Сборку "${bundle.name}" добавлено в корзину!`);
+    toast.success(`Збірку "${bundle.name}" додано в кошик!`);
   };
 
   const calculateSavingsPercent = (totalValue: number, bundlePrice: number) => {
@@ -53,12 +53,12 @@ const Bundles = () => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Gift className="h-10 w-10 text-primary" />
             <h1 className="text-4xl md:text-5xl font-bold text-center">
-              Выгодные <span className="text-primary">Сборки</span>
+              Вигідні <span className="text-primary">Збірки</span>
             </h1>
           </div>
           <p className="text-lg text-muted-foreground text-center max-w-2xl mx-auto">
-            Покупайте комплекты товаров по специальным ценам и экономьте до 50%!
-            Все сборки тщательно подобраны для максимальной выгоды.
+            Купуйте комплекти товарів за спеціальними цінами та економте до 50%!
+            Всі збірки ретельно підібрані для максимальної вигоди.
           </p>
         </div>
       </section>
@@ -84,9 +84,9 @@ const Bundles = () => {
           ) : bundles.length === 0 ? (
             <div className="text-center py-20">
               <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-semibold mb-2">Сборок пока нет</h2>
+              <h2 className="text-2xl font-semibold mb-2">Збірок поки немає</h2>
               <p className="text-muted-foreground mb-6">
-                Скоро здесь появятся выгодные предложения!
+                Скоро тут з'являться вигідні пропозиції!
               </p>
               <Button asChild>
                 <Link to="/#shop">Перейти в магазин</Link>
@@ -141,7 +141,7 @@ const Bundles = () => {
                         className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm"
                       >
                         <Tag className="h-3 w-3 mr-1" />
-                        {bundle.items?.length || 0} товаров
+                        {bundle.items?.length || 0} товарів
                       </Badge>
                     </div>
 
@@ -230,7 +230,7 @@ const Bundles = () => {
               <div>
                 <h3 className="font-semibold mb-1">Максимальна економія</h3>
                 <p className="text-sm text-muted-foreground">
-                  Сборки дешевше на 15-50% ніж окремі товари
+                  Збірки дешевші на 15-50% ніж окремі товари
                 </p>
               </div>
             </div>
@@ -252,7 +252,7 @@ const Bundles = () => {
               <div>
                 <h3 className="font-semibold mb-1">Обмежені пропозиції</h3>
                 <p className="text-sm text-muted-foreground">
-                  Деякі сборки доступні тільки певний час
+                  Деякі збірки доступні тільки певний час
                 </p>
               </div>
             </div>

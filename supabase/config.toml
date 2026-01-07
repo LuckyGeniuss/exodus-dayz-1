@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.send-recommendations]
 verify_jwt = true
+
+[functions.send-promo-email]
+verify_jwt = true
