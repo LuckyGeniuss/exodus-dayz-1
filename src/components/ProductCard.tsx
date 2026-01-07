@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ShoppingCart, Heart, Tag, Star, Eye, Zap, Scale } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -7,6 +8,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { usePromotions } from "@/hooks/usePromotions";
 import { useCompare } from "@/contexts/CompareContext";
 import FlashSaleBadge from "./FlashSaleBadge";
+import QuickViewModal from "./QuickViewModal";
 import { toast } from "sonner";
 export interface Product {
   id: string;
@@ -63,6 +65,7 @@ const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { getProductPromotion } = usePromotions();
   const { addToCompare, removeFromCompare, isInCompare, canAddMore } = useCompare();
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
   const inWishlist = isInWishlist(product.id);
   const inCompare = isInCompare(product.id);
   const promotion = getProductPromotion(product.id);
@@ -70,6 +73,12 @@ const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
   const finalPrice = promotion 
     ? product.price * (1 - promotion.discount_percent / 100)
     : product.price;
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuickViewOpen(true);
+  };
 
   const handleCompareToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -158,7 +167,10 @@ const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
             <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
             
             {/* Quick view indicator */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div 
+              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+              onClick={handleQuickView}
+            >
               <div className="bg-background/90 backdrop-blur-sm rounded-full p-3 shadow-lg transform scale-75 group-hover:scale-100 transition-transform duration-300">
                 <Eye className="h-5 w-5 text-primary" />
               </div>
@@ -241,6 +253,13 @@ const ProductCard = ({ product, onAddToCart, rating }: ProductCardProps) => {
           </Button>
         </CardFooter>
       </Card>
+
+      {/* Quick View Modal */}
+      <QuickViewModal 
+        product={product}
+        open={quickViewOpen}
+        onOpenChange={setQuickViewOpen}
+      />
     </Link>
   );
 };
