@@ -19,7 +19,7 @@ interface AdminMobileNavProps {
 }
 
 const allItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, section: "Огляд" },
+  { id: "dashboard", label: "Панель", icon: LayoutDashboard, section: "Огляд" },
   { id: "analytics", label: "Аналітика", icon: BarChart3, section: "Огляд" },
   { id: "monitoring", label: "Моніторинг", icon: Activity, section: "Огляд" },
   { id: "products", label: "Продукти", icon: Package, section: "Каталог" },
@@ -29,7 +29,7 @@ const allItems = [
   { id: "product-analytics", label: "Аналітика товарів", icon: PieChart, section: "Каталог" },
   { id: "orders", label: "Замовлення", icon: ShoppingCart, section: "Продажі" },
   { id: "promo", label: "Промокоди", icon: Tag, section: "Продажі" },
-  { id: "flash-sales", label: "Flash Sale", icon: Zap, section: "Продажі" },
+  { id: "flash-sales", label: "Флеш-акції", icon: Zap, section: "Продажі" },
   { id: "users", label: "Користувачі", icon: Users, section: "Користувачі" },
   { id: "roles", label: "Ролі", icon: Shield, section: "Користувачі" },
   { id: "bans", label: "Блокування", icon: Ban, section: "Користувачі" },

@@ -52,7 +52,7 @@ const Header = ({ onCartOpen, cartItemCount = 0 }: HeaderProps) => {
             </a>
             <Link to="/bundles" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1">
               <Gift className="h-4 w-4" />
-              Сборки
+              Збірки
             </Link>
             <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Про сервер
