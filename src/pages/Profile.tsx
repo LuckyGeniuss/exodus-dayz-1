@@ -15,7 +15,9 @@ import SteamAuthButton from '@/components/auth/SteamAuthButton';
 import DiscordLinkButton from '@/components/auth/DiscordLinkButton';
 import AchievementsModal from '@/components/AchievementsModal';
 import BalanceHistory from '@/components/BalanceHistory';
-import ReferralCard from '@/components/ReferralCard';
+import ReferralCardV2 from '@/components/ReferralCardV2';
+import ReferralLevelsProgress from '@/components/ReferralLevelsProgress';
+import { useReferralV2 } from '@/hooks/useReferralV2';
 import PromoCodeHistory from '@/components/PromoCodeHistory';
 import LoyaltyCard from '@/components/LoyaltyCard';
 import XPProgressCard from '@/components/XPProgressCard';
@@ -40,6 +42,7 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const { stats } = useReferralV2();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -300,8 +303,9 @@ const Profile = () => {
           {/* Promo Code History */}
           <PromoCodeHistory />
 
-          {/* Referral Card */}
-          <ReferralCard />
+          {/* Referral Cards */}
+          <ReferralCardV2 />
+          <ReferralLevelsProgress totalReferrals={stats.totalReferrals} totalEarned={stats.totalEarned} />
 
           {/* Balance History */}
           <BalanceHistory />
