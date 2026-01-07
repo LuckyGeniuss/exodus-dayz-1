@@ -34,6 +34,8 @@ import BannerManagement from '@/components/admin/BannerManagement';
 import CronJobsManagement from '@/components/admin/CronJobsManagement';
 import CategoryManagement from '@/components/admin/CategoryManagement';
 import EmailStatsDetails from '@/components/admin/EmailStatsDetails';
+import PromoEmailSender from '@/components/admin/PromoEmailSender';
+import BundleAnalytics from '@/components/admin/BundleAnalytics';
 
 const COLLAPSED_KEY = 'admin_sidebar_collapsed';
 
@@ -82,6 +84,8 @@ const Admin = () => {
         return <CategoryManagement />;
       case 'bundles':
         return <BundleManagement />;
+      case 'bundle-analytics':
+        return <BundleAnalytics />;
       case 'inventory':
         return <InventoryManagement />;
       case 'orders':
@@ -108,6 +112,8 @@ const Admin = () => {
         return <SupportTicketManagement />;
       case 'broadcast':
         return <BroadcastManagement />;
+      case 'promo-email':
+        return <PromoEmailSender />;
       case 'audit':
         return <AuditLogs />;
       case 'monitoring':
