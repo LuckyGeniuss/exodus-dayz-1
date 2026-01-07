@@ -35,10 +35,20 @@ import CronJobsManagement from '@/components/admin/CronJobsManagement';
 import CategoryManagement from '@/components/admin/CategoryManagement';
 import EmailStatsDetails from '@/components/admin/EmailStatsDetails';
 
+const COLLAPSED_KEY = 'admin_sidebar_collapsed';
+
 const Admin = () => {
   const { isAdmin, loading } = useAdmin();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    try {
+      const saved = localStorage.getItem(COLLAPSED_KEY);
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -125,7 +135,12 @@ const Admin = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 flex">
-        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <AdminSidebar 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab}
+          isCollapsed={isCollapsed}
+          onCollapsedChange={setIsCollapsed}
+        />
         <main className="flex-1 p-6 overflow-auto">
           <AdminMobileNav activeTab={activeTab} onTabChange={setActiveTab} />
           <h1 className="text-3xl font-military mb-6 lg:mb-8">Адмін Панель</h1>
