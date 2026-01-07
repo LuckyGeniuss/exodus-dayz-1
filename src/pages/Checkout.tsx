@@ -41,7 +41,10 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(2);
   const [showConfetti, setShowConfetti] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'usdt' | 'balance'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'usdt' | 'balance'>(() => {
+    const saved = localStorage.getItem('lastPaymentMethod');
+    return (saved as 'card' | 'usdt' | 'balance') || 'card';
+  });
   const [profile, setProfile] = useState<any>(null);
   const [processing, setProcessing] = useState(false);
   const [promoCodeInput, setPromoCodeInput] = useState('');
@@ -269,7 +272,13 @@ const Checkout = () => {
               <CardDescription>Виберіть зручний спосіб оплати</CardDescription>
             </CardHeader>
             <CardContent>
-              <RadioGroup value={paymentMethod} onValueChange={(value: any) => setPaymentMethod(value)}>
+              <RadioGroup 
+                value={paymentMethod} 
+                onValueChange={(value: 'card' | 'usdt' | 'balance') => {
+                  setPaymentMethod(value);
+                  localStorage.setItem('lastPaymentMethod', value);
+                }}
+              >
                 <div className="flex items-center space-x-2 mb-3">
                   <RadioGroupItem value="card" id="card" />
                   <Label htmlFor="card" className="flex items-center gap-2 cursor-pointer">

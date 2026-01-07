@@ -29,6 +29,7 @@ import ProfileSkeleton from '@/components/ProfileSkeleton';
 import BirthdayCard from '@/components/BirthdayCard';
 import UserStatsCard from '@/components/UserStatsCard';
 import ProductRecommendations from '@/components/ProductRecommendations';
+import PriceAlertsList from '@/components/PriceAlertsList';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -304,6 +305,11 @@ const Profile = () => {
 
           {/* Balance History */}
           <BalanceHistory />
+
+          {/* Price Alerts */}
+          <div className="md:col-span-2">
+            <PriceAlertsList />
+          </div>
 
           {/* Recommendations */}
           <div className="md:col-span-2">

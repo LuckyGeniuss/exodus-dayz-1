@@ -176,6 +176,15 @@ const ProductDetail = () => {
               <Button variant="outline" size="lg" className="w-full" onClick={handleBuyNow}>
                 Купити зараз
               </Button>
+              
+              {/* Price Alert */}
+              <div className="pt-2">
+                <PriceAlertCard 
+                  productId={product.id} 
+                  productName={product.name} 
+                  currentPrice={finalPrice || product.price}
+                />
+              </div>
             </div>
 
             {/* Features */}
