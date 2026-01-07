@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#18181b"/>
+      <stop offset="100%" style="stop-color:#27272a"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#dc2626"/>
+      <stop offset="50%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#dc2626"/>
+    </linearGradient>
+    <linearGradient id="subtextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#71717a"/>
+      <stop offset="100%" style="stop-color:#a1a1aa"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="120" rx="12" fill="url(#bgGrad)"/>
+  
+  <!-- Border -->
+  <rect x="1" y="1" width="398" height="118" rx="11" fill="none" stroke="#dc2626" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Icon - Crosshair/Target -->
+  <g transform="translate(30, 35)" filter="url(#glow)">
+    <circle cx="25" cy="25" r="20" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+    <circle cx="25" cy="25" r="12" fill="none" stroke="#dc2626" stroke-width="2"/>
+    <circle cx="25" cy="25" r="3" fill="#dc2626"/>
+    <line x1="25" y1="0" x2="25" y2="12" stroke="#dc2626" stroke-width="2"/>
+    <line x1="25" y1="38" x2="25" y2="50" stroke="#dc2626" stroke-width="2"/>
+    <line x1="0" y1="25" x2="12" y2="25" stroke="#dc2626" stroke-width="2"/>
+    <line x1="38" y1="25" x2="50" y2="25" stroke="#dc2626" stroke-width="2"/>
+  </g>
+  
+  <!-- Main Text -->
+  <text x="95" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="48" font-weight="900" 
+        fill="url(#textGrad)" filter="url(#shadow)" letter-spacing="4">
+    EXODUS
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="97" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="600" 
+        fill="url(#subtextGrad)" letter-spacing="8">
+    DAYZ SHOP
+  </text>
+  
+  <!-- Decorative lines -->
+  <line x1="290" y1="50" x2="380" y2="50" stroke="#dc2626" stroke-width="1" opacity="0.5"/>
+  <line x1="290" y1="70" x2="360" y2="70" stroke="#dc2626" stroke-width="1" opacity="0.3"/>
+  <line x1="290" y1="90" x2="340" y2="90" stroke="#dc2626" stroke-width="1" opacity="0.2"/>
+  
+  <!-- Version badge -->
+  <rect x="330" y="15" width="55" height="22" rx="4" fill="#dc2626" opacity="0.2"/>
+  <text x="357" y="31" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" 
+        fill="#dc2626" text-anchor="middle">v2.0</text>
+</svg>
