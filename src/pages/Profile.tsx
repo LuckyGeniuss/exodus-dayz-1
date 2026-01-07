@@ -27,6 +27,8 @@ import PushNotificationSettings from '@/components/PushNotificationSettings';
 import EmailNotificationSettings from '@/components/EmailNotificationSettings';
 import ProfileSkeleton from '@/components/ProfileSkeleton';
 import BirthdayCard from '@/components/BirthdayCard';
+import UserStatsCard from '@/components/UserStatsCard';
+import ProductRecommendations from '@/components/ProductRecommendations';
 
 const Profile = () => {
   const { user, loading } = useAuth();
@@ -219,6 +221,9 @@ const Profile = () => {
             </CardContent>
           </Card>
 
+          {/* User Stats Card */}
+          <UserStatsCard />
+
           {/* XP Progress Card */}
           <XPProgressCard />
 
@@ -299,6 +304,11 @@ const Profile = () => {
 
           {/* Balance History */}
           <BalanceHistory />
+
+          {/* Recommendations */}
+          <div className="md:col-span-2">
+            <ProductRecommendations title="Рекомендовано для вас" limit={4} />
+          </div>
         </div>
         )}
       </main>

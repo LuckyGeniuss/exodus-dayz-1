@@ -19,6 +19,8 @@ import { Product } from "@/components/ProductCard";
 import ReviewList from "@/components/ReviewList";
 import ReviewForm from "@/components/ReviewForm";
 import RecentlyViewedProducts from "@/components/RecentlyViewedProducts";
+import PriceAlertCard from "@/components/PriceAlertCard";
+import ProductRecommendations from "@/components/ProductRecommendations";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
