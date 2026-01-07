@@ -19,6 +19,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CheckoutStepper from '@/components/CheckoutStepper';
 import Confetti from '@/components/Confetti';
+import FeedbackRequest from '@/components/FeedbackRequest';
 
 const steps = [
   { id: 1, title: "Кошик" },
@@ -48,6 +49,7 @@ const Checkout = () => {
   const [profile, setProfile] = useState<any>(null);
   const [processing, setProcessing] = useState(false);
   const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [completedOrderId, setCompletedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -198,6 +200,7 @@ const Checkout = () => {
 
       setCurrentStep(3);
       setShowConfetti(true);
+      setCompletedOrderId(data.orderId);
       toast.success('Замовлення успішно створено!');
       setTimeout(() => {
         navigate('/orders');
@@ -428,6 +431,11 @@ const Checkout = () => {
       </div>
       </main>
       <Footer />
+
+      {/* Feedback Request after successful order */}
+      {completedOrderId && (
+        <FeedbackRequest orderId={completedOrderId} orderAmount={total} />
+      )}
     </div>
   );
 };
